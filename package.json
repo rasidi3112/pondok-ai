@@ -33,7 +33,13 @@
     "private-ai",
     "self-hosted",
     "vector-database",
-    "qdrant"
+    "qdrant",
+    "local-llm",
+    "openai-compatible",
+    "chatgpt-alternative",
+    "llama",
+    "apple-silicon",
+    "gpu"
   ],
   "author": "rasidi3112 (https://github.com/rasidi3112)",
   "license": "MIT",
@@ -57,6 +63,10 @@
   "homepage": "https://github.com/rasidi3112/pondok-ai",
   "bugs": {
     "url": "https://github.com/rasidi3112/pondok-ai/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/rasidi3112"
   },
   "dependencies": {
     "boxen": "^8.0.1",

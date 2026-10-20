@@ -2,9 +2,14 @@
 
 ## Supported Versions
 
+Security fixes are released for the latest minor version only.
+
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.1.x   | :white_check_mark: |
+| 0.3.x   | :white_check_mark: |
+| < 0.3   | :x:                |
+
+The `local-ai-stack` package (0.2.x and older) is deprecated. Please move to `pondok-ai`.
 
 ## Security Defaults in pondok-ai
 
@@ -18,7 +23,7 @@
 
 If you discover a security vulnerability within `pondok-ai`, please do NOT open a public issue.
 
-Instead, please send an email to **security@pondok-ai.org** (or use GitHub Private Vulnerability Reporting).
+Instead, report it privately through [GitHub Private Vulnerability Reporting](https://github.com/rasidi3112/pondok-ai/security/advisories/new).
 
 Please provide:
 - A description of the vulnerability and potential impact.
