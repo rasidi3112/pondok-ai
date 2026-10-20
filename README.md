@@ -149,6 +149,13 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 
 One machine can serve a whole classroom, office, or pesantren. Everyone on the same Wi-Fi or LAN opens Open WebUI in their browser, each with their own account and chat history, while the models run on that one machine.
 
+<a href="docs/demo/classroom.mp4">
+  <img src="docs/demo/classroom.gif" alt="Classroom demo: pondok-ai share prints a QR code, a student signs up on a phone, the teacher approves, and the student chats in Indonesian" width="100%">
+</a>
+
+<sub>The teacher runs <code>pondok-ai share</code>, a student opens the link on a phone and signs up, the teacher approves the account, and the student asks a question in Indonesian. Recorded on a CPU-only machine; waiting for the model is sped up and labelled on screen.<br>
+<a href="docs/demo/classroom.mp4"><b>▶ Watch the 1080p video</b></a></sub>
+
 1. Start the stack, then open http://localhost:3000 on this machine and create the admin account.
 
    ```bash
