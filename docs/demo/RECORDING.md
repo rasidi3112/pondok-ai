@@ -69,10 +69,10 @@ npm i --no-save playwright
 WEBUI_EMAIL=you@example.com WEBUI_PASSWORD=... node docs/demo/record-browser.mjs
 ```
 
-This writes `docs/demo/browser.webm`. Set `DEMO_MODEL` or `DEMO_PROMPT` to change the model or question,
+This writes `docs/demo/browser.webm` at 960×540, the same width as the GIF, so the chat text is not scaled down. Set `DEMO_MODEL` or `DEMO_PROMPT` to change the model or question,
 and `CHROMIUM_PATH` to use a browser you already have.
 
-To record by hand instead, use a 1280×720 dark-mode browser window, open http://localhost:3000,
+To record by hand instead, use a 960×540 dark-mode browser window, open http://localhost:3000,
 send the prompt, stop about one second after the reply finishes, and save it as `docs/demo/browser.mp4`.
 
 ## 4. Build the GIF
@@ -83,6 +83,18 @@ docs/demo/make-gif.sh docs/demo/terminal.mp4 docs/demo/browser.webm
 
 This writes `docs/demo/demo.gif` at 960px wide and 12 fps. Keep it under about 8 MB so GitHub shows it inline.
 If it is too large, try `WIDTH=800 FPS=10 docs/demo/make-gif.sh ...`.
+
+On a machine without a GPU the first token and the reply together can take about a minute, so trim and speed up both clips
+before building the GIF, and label every sped-up part on screen. The committed take used these cuts
+(start–end in seconds of the raw clip, then speed):
+
+| Clip | Kept at 1x | Sped up, with an on-screen label |
+|---|---|---|
+| terminal | 0–6.2 (init), 10.3–14.5 (typing `up`), 36–38.5 (ready) | 14.5–36 at 6x, "waiting for health checks" |
+| browser | 1.6–7 (typing the prompt), 65–68.5 (finished reply) | 7–41 at 15x, "waiting for the first token (CPU only)"; 41–65 at 4x, "reply streaming (CPU only)" |
+
+Use ffmpeg `trim`, `setpts=(PTS-STARTPTS)/SPEED` and `drawtext` per segment, `concat` the segments,
+and pass the two edited clips to `make-gif.sh`.
 
 Commit only `docs/demo/demo.gif`. The `.mp4` and `.webm` sources are ignored by git.
 

@@ -9,7 +9,7 @@ Require npx
 Require docker
 
 Set Shell "bash"
-Set FontSize 16
+Set FontSize 20
 Set Width 1280
 Set Height 720
 Set Padding 24

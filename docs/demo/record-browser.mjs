@@ -14,7 +14,7 @@ const model = process.env.DEMO_MODEL ?? 'llama3.2:3b';
 const prompt =
   process.env.DEMO_PROMPT ?? 'Explain in two sentences why running AI locally is good for privacy.';
 const out = process.env.OUT ?? 'docs/demo/browser.webm';
-const size = { width: 1280, height: 720 };
+const size = { width: 960, height: 540 };
 
 // Sign in before recording so the clip starts on a ready chat screen.
 const signin = await fetch(`${url}/api/v1/auths/signin`, {
