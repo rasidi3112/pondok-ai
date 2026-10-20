@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-20
+
 ### Added
 - Opt-in native Ollama on macOS so models run on the Apple Silicon GPU (Metal). `pondok-ai init --native-ollama`, or answering yes when an Apple Silicon GPU is detected, skips the Ollama container and points Open WebUI and the API Gateway at the host Ollama via `host.docker.internal`. `model` commands, health checks and `up` use the host Ollama in this mode. Linux and Windows behavior is unchanged.
 - Demo GIF and 1080p demo video in the README, with the scripts used to record them in `docs/demo/`.
