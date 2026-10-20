@@ -149,6 +149,13 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 
 Satu komputer bisa melayani satu kelas, kantor, atau pesantren. Semua orang yang tersambung ke WiFi atau LAN yang sama membuka Open WebUI di browser, masing-masing dengan akun dan riwayat chat sendiri, sementara modelnya berjalan di satu komputer itu.
 
+<a href="docs/demo/classroom.mp4">
+  <img src="docs/demo/classroom.gif" alt="Demo kelas: pondok-ai share menampilkan QR code, siswa mendaftar dari ponsel, guru menyetujui, lalu siswa chat dalam bahasa Indonesia" width="100%">
+</a>
+
+<sub>Guru menjalankan <code>pondok-ai share</code>, siswa membuka tautannya di ponsel dan mendaftar, guru menyetujui akunnya, lalu siswa bertanya dalam bahasa Indonesia. Direkam di mesin tanpa GPU (hanya CPU); waktu tunggu model dipercepat dan ditandai di layar.<br>
+<a href="docs/demo/classroom.mp4"><b>▶ Tonton video 1080p</b></a></sub>
+
 1. Nyalakan stack, lalu buka http://localhost:3000 di komputer ini dan buat akun admin.
 
    ```bash
