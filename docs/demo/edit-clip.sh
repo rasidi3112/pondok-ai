@@ -15,24 +15,25 @@ fi
 
 command -v ffmpeg >/dev/null || { echo "ffmpeg is required" >&2; exit 1; }
 
-filter=""
-inputs=""
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+
+# Encode each segment on its own (seeking into the input) so long clips never sit in memory, then join them.
 n=0
 IFS=';' read -ra parts <<< "$SEGMENTS"
 for part in "${parts[@]}"; do
   read -r start end speed label <<< "$part"
-  f="[0:v]trim=start=$start:end=$end,setpts=(PTS-STARTPTS)/$speed"
+  f="setpts=(PTS-STARTPTS)/$speed"
   if [ -n "${label:-}" ]; then
     label="${label//:/\\:}"
     f="$f,drawtext=fontfile='$FONT':text='$label':fontsize=$FONT_SIZE:fontcolor=0x1e1e2e"
     f="$f:box=1:boxcolor=0xf9e2af:boxborderw=16:x=w-tw-48:y=40"
   fi
-  filter="$filter$f,fps=30[v$n];"
-  inputs="$inputs[v$n]"
+  ffmpeg -loglevel error -y -ss "$start" -to "$end" -i "$IN" -an -vf "$f,fps=30" \
+    -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p "$TMP/$n.mp4"
+  echo "file '$TMP/$n.mp4'" >> "$TMP/list.txt"
   n=$((n + 1))
 done
-filter="$filter${inputs}concat=n=$n:v=1:a=0[out]"
 
-ffmpeg -loglevel error -y -i "$IN" -filter_complex "$filter" -map "[out]" \
-  -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p "$OUT"
+ffmpeg -loglevel error -y -f concat -safe 0 -i "$TMP/list.txt" -c copy "$OUT"
 echo "Wrote $OUT ($(ffprobe -v error -show_entries format=duration -of csv=p=0 "$OUT")s)"

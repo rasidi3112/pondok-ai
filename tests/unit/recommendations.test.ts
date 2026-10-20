@@ -3,6 +3,7 @@ import {
   evaluateModel,
   getModelRecommendations,
   validateModelFit,
+  estimateModelSpec,
   POPULAR_MODELS,
   ModelSpec,
 } from '../../src/system/recommendations.js';
@@ -127,6 +128,74 @@ describe('Smart Hardware Detection & Model Recommendations', () => {
 
       expect(fit.spec).toBeDefined();
       expect(fit.spec?.name).toContain('llama3.2');
+    });
+
+    it('should not size a larger tag like a smaller sibling of the same family', () => {
+      const system = createMockSystem({ totalMemoryGB: 8, vramGB: null, diskFreeGB: 50 });
+
+      // qwen2.5:14b used to match qwen2.5:1.5b by prefix and pass as compatible
+      const fit = validateModelFit('qwen2.5:14b', system);
+      expect(fit.canRun).toBe(false);
+      expect(fit.tier).toBe('incompatible');
+      expect(fit.spec?.parameterSize).toBe('14B');
+
+      expect(validateModelFit('qwen2.5-coder:32b', system).canRun).toBe(false);
+      expect(validateModelFit('deepseek-r1:32b', system).canRun).toBe(false);
+    });
+
+    it('should still use the known spec for listed models', () => {
+      const system = createMockSystem({ totalMemoryGB: 16, diskFreeGB: 50 });
+      expect(validateModelFit('qwen2.5:1.5b', system).spec?.diskSizeGB).toBe(1.0);
+    });
+  });
+
+  describe('estimateModelSpec', () => {
+    it('should estimate 4-bit requirements from the parameter count in the tag', () => {
+      const spec = estimateModelSpec('qwen2.5:14b')!;
+      expect(spec.parameterSize).toBe('14B');
+      expect(spec.diskSizeGB).toBe(8.4);
+      expect(spec.minRamGB).toBe(12);
+      expect(spec.recommendedRamGB).toBe(15);
+    });
+
+    it('should account for higher-precision quantization tags', () => {
+      expect(estimateModelSpec('llama3.1:8b-instruct-q8_0')!.diskSizeGB).toBe(8.6);
+      expect(estimateModelSpec('llama3.1:8b-instruct-fp16')!.diskSizeGB).toBe(16);
+      expect(estimateModelSpec('qwen2.5:1.5b')!.parameterSize).toBe('1.5B');
+    });
+
+    it('should return undefined when the tag names no size', () => {
+      expect(estimateModelSpec('llama3.2:latest')).toBeUndefined();
+      expect(estimateModelSpec('smollm:135m')).toBeUndefined();
+      expect(estimateModelSpec('mixtral:8x7b')).toBeUndefined();
+      expect(estimateModelSpec('llama3.2')).toBeUndefined();
+    });
+  });
+
+  describe('Language recommendations', () => {
+    it('should only list models that handle the requested language', () => {
+      const report = getModelRecommendations(createMockSystem(), { language: 'id' });
+      const all = [...report.compatibleModels, ...report.tightModels, ...report.incompatibleModels];
+
+      expect(all.length).toBeGreaterThan(0);
+      expect(all.every((r) => r.model.languages?.includes('id'))).toBe(true);
+      expect(all.map((r) => r.model.name)).toContain('bge-m3');
+    });
+
+    it('should pick an Indonesian-capable default for each machine size', () => {
+      const pick = (ram: number) =>
+        getModelRecommendations(createMockSystem({ totalMemoryGB: ram }), { language: 'id' })
+          .recommendedDefault.name;
+
+      expect(pick(4)).toBe('qwen2.5:1.5b');
+      expect(pick(8)).toBe('gemma3:4b');
+      expect(pick(16)).toBe('gemma3:12b');
+      expect(pick(64)).toBe('gemma3:12b');
+    });
+
+    it('should keep the default list unchanged without a language', () => {
+      const report = getModelRecommendations(createMockSystem({ totalMemoryGB: 8 }));
+      expect(report.recommendedDefault.name).toBe('llama3.2:3b');
     });
   });
 });

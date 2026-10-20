@@ -9,14 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-20
+
+### Fixed
+- Models without tool support, such as `gemma3:4b` and `gemma3:12b` from `model recommend --lang id`, can chat in Open WebUI. Open WebUI 0.11 sends its built-in tools with every chat, which Ollama rejects for these models with "does not support tools". New stacks now start Open WebUI with legacy function calling (`DEFAULT_MODEL_PARAMS`). Open WebUI keeps this setting in its database after the first start, so existing stacks change it once in the Admin Panel; see [Troubleshooting](docs/troubleshooting.md#does-not-support-tools-in-open-webui).
+
+## [0.5.0] - 2026-10-20
+
+### Added
+- **Share on your network.** `pondok-ai share` publishes Open WebUI on the local network and prints its addresses with a QR code, so a classroom or office can use one machine from their own devices. It refuses to run until the Open WebUI admin account exists, keeps login on (`WEBUI_AUTH=True`), lets approved users chat with the installed models (`BYPASS_MODEL_ACCESS_CONTROL=True`), and leaves every other service on the bind address. It tells the admin to turn on New Sign Ups when they are off. `--light` draws the QR code for light terminal themes, and `pondok-ai share --stop` turns sharing off.
+- **Models for Bahasa Indonesia.** `pondok-ai model recommend --lang id` lists only models that answer well in Indonesian and picks one for your RAM: Qwen 2.5 (1.5B, 3B, 7B), Gemma 3 (4B, 12B), Aya Expanse (8B), and BGE-M3 embeddings for RAG over Indonesian documents. These models are also added to the default list.
+
+### Fixed
+- Recreating the Open WebUI container (`update`, `share`, `config edit`) no longer logs everyone out. Its session signing key is now kept in the Open WebUI data volume (`WEBUI_SECRET_KEY_FILE`) instead of the container's filesystem.
+- `model install` no longer sizes a larger tag like a smaller model of the same family. `qwen2.5:14b` or `deepseek-r1:32b` used to match `qwen2.5:1.5b` or `deepseek-r1:7b` and pass the memory check; tags that are not in the list are now estimated from their parameter count and quantization.
+
+## [0.4.0] - 2026-10-20
+
 ### Added
 - Opt-in native Ollama on macOS so models run on the Apple Silicon GPU (Metal). `pondok-ai init --native-ollama`, or answering yes when an Apple Silicon GPU is detected, skips the Ollama container and points Open WebUI and the API Gateway at the host Ollama via `host.docker.internal`. `model` commands, health checks and `up` use the host Ollama in this mode. Linux and Windows behavior is unchanged.
 - Demo GIF and 1080p demo video in the README, with the scripts used to record them in `docs/demo/`.
+- Polish README translation (thanks @MeydhiXploit).
 - GitHub issue forms, Dependabot, CodeQL scanning, and a workflow that publishes the API Gateway image to `ghcr.io/rasidi3112/pondok-ai-gateway` (amd64 and arm64) on each release tag.
 
 ### Changed
 - The NVIDIA GPU prompt no longer appears on macOS.
 - README restructured with screenshots, a feature table and a shorter quickstart.
+- All 16 translated READMEs synced with the English README, with the same language selector in every file.
 - Security reports now go through GitHub Private Vulnerability Reporting.
 
 ## [0.3.1] - 2026-10-13
