@@ -118,6 +118,9 @@ export function generateComposeFile(config: StackConfig, _env?: GeneratedEnv): s
         OLLAMA_BASE_URL: ollamaUrl,
         // Keep the session signing key in the data volume, so recreating the container keeps people logged in
         WEBUI_SECRET_KEY_FILE: '/app/backend/data/.webui_secret_key',
+        // Open WebUI 0.11 sends its built-in tools with every chat in native mode, which models
+        // without tool support, such as Gemma 3, reject. Read on first start only, then kept in the database.
+        DEFAULT_MODEL_PARAMS: '{"function_calling":"legacy"}',
         ...(lanShare && {
           // Never let a shared Open WebUI run without login
           WEBUI_AUTH: 'True',

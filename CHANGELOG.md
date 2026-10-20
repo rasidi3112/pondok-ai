@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-20
+
+### Fixed
+- Models without tool support, such as `gemma3:4b` and `gemma3:12b` from `model recommend --lang id`, can chat in Open WebUI. Open WebUI 0.11 sends its built-in tools with every chat, which Ollama rejects for these models with "does not support tools". New stacks now start Open WebUI with legacy function calling (`DEFAULT_MODEL_PARAMS`). Open WebUI keeps this setting in its database after the first start, so existing stacks change it once in the Admin Panel; see [Troubleshooting](docs/troubleshooting.md#does-not-support-tools-in-open-webui).
+
 ## [0.5.0] - 2026-10-20
 
 ### Added

@@ -49,6 +49,14 @@ describe('LAN share', () => {
       );
     });
 
+    it('defaults Open WebUI to legacy function calling so models without tool support can chat', () => {
+      const config = getDefaultConfig('minimal');
+      const compose = yamlLoad(generateComposeFile(config)) as ParsedCompose;
+
+      const params = compose.services.openwebui.environment?.DEFAULT_MODEL_PARAMS;
+      expect(JSON.parse(params ?? '{}')).toEqual({ function_calling: 'legacy' });
+    });
+
     it('publishes only Open WebUI on all interfaces, with login forced on', () => {
       const config = getDefaultConfig('full');
       config.network.lanShare = true;
