@@ -117,3 +117,69 @@ Commit `demo.mp4`, `demo.gif`, and the screenshots. The raw and cut clips are ig
 - [ ] The reply visibly comes from `llama3.2:3b` running locally
 - [ ] Every sped-up part is labelled on screen
 - [ ] The GIF loops cleanly and is under about 10 MB
+
+# Recording the classroom demo
+
+The demo in the "Share on your network" section shows `pondok-ai share` end to end in about a minute:
+the teacher shares Open WebUI, a student opens the link on a phone and signs up, the teacher approves the
+account, and the student asks a question in Indonesian. It is built from four 1080p clips stitched by
+`make-classroom.sh` into `docs/demo/classroom.mp4` (1920×1080) and `docs/demo/classroom.gif` (1280px).
+
+| Clip | Recorded with | Shows |
+|---|---|---|
+| `classroom-terminal.mp4` | `vhs docs/demo/classroom.tape` | `npx pondok-ai share` printing the LAN link and the QR code |
+| `classroom-signup.mp4` | `record-classroom.mjs signup` | A Pixel 7 sized browser opens the link, signs up, lands on "Account Activation Pending" |
+| `classroom-admin.mp4` | `record-classroom.mjs admin` | Admin Panel > Users, the student's role changed from Pending to User |
+| `classroom-chat.mp4` | `record-classroom.mjs chat` | The student taps "Check Again" and chats |
+
+## 1. Prepare
+
+Use a fresh Open WebUI volume so the student list only shows the demo accounts, then:
+
+```bash
+mkdir -p /tmp/pondok-kelas && cd /tmp/pondok-kelas
+npx pondok-ai init --preset minimal --yes
+npx pondok-ai up
+npx pondok-ai model install llama3.2:3b
+```
+
+Open http://localhost:3000, create the admin account (a teacher name and an `example.com` email), then in
+**Admin Panel > Settings > General** turn on **New Sign Ups**, keep **Default User Role** at **Pending**, and turn off
+**Show Admin Details in Account Pending Overlay**. In **Admin Panel > Settings > Models** make `llama3.2:3b` the
+default model. Send one throwaway message so the model is loaded, then run `npx pondok-ai share` once so the
+recorded run does not recreate the container.
+
+The phone has to reach the LAN address that `share` prints, not `localhost`. A second device on the same Wi-Fi
+works; on Linux a network namespace joined to the host with a veth pair does too (the committed take used
+`192.168.50.10` for the host and ran the phone steps inside the namespace).
+
+## 2. Record
+
+```bash
+PONDOK_DIR=/tmp/pondok-kelas vhs docs/demo/classroom.tape
+export SHARE_URL=http://192.168.50.10:3000 ADMIN_EMAIL=... ADMIN_PASSWORD=...
+node docs/demo/record-classroom.mjs signup
+node docs/demo/record-classroom.mjs chat &   # waits on the pending screen
+node docs/demo/record-classroom.mjs admin    # approves; the chat step then continues
+wait
+```
+
+The phone is a Pixel 7 viewport at 2× device scale and the admin page is 1024×576 at 1.875× (1920×1080), both
+recorded as timed screenshots so text stays sharp. Headless screenshots have no mouse pointer, so the admin clip
+draws a dot that follows the real mouse.
+
+`gemma3:4b` (what `model recommend --lang id` suggests) answers this prompt well, but Open WebUI 0.11 sends its
+built-in tools with every chat and Ollama rejects them for models without tool support ("does not support tools").
+The committed take uses `llama3.2:3b`, which works out of the box.
+
+## 3. Cut and build
+
+The committed take used:
+
+```bash
+CHAT_CUT="0 10 1;10 65.5 20 20x speed: model thinking (CPU only);65.5 113.3 6 6x speed: reply streaming (CPU only);113.3 118 1" \
+  docs/demo/make-classroom.sh
+```
+
+`TERMINAL_CUT`, `SIGNUP_CUT` and `ADMIN_CUT` default to the whole clip (the terminal clip to its first 9 seconds).
+Commit `classroom.mp4` and `classroom.gif`; the raw clips are ignored by git.

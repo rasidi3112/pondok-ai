@@ -67,6 +67,15 @@ This verifies:
 
 ---
 
+### "does not support tools" in Open WebUI
+**Symptom**: Chatting with a model such as `gemma3:4b` in Open WebUI fails with `... does not support tools`.
+**Cause**: Open WebUI 0.11 defaults to native function calling and sends its built-in tools with every chat. Ollama rejects tools for models whose template has no tool support.
+**Solution**:
+- Stacks created with pondok-ai 0.5.1 or later start Open WebUI with legacy function calling, which works with every model.
+- Stacks created earlier keep the setting stored in Open WebUI's database, so change it once as the admin: **Admin Panel > Settings > Models > Model Defaults > Configure > Model Parameters > Configure**, click **Function Calling** until it shows **Legacy**, then **Save**. To fix a single model instead, open it from the same **Models** list and set **Function Calling** under **Advanced Params**.
+
+---
+
 ### Checking Container Logs
 To inspect live logs from any service:
 ```bash

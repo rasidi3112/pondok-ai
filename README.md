@@ -12,7 +12,7 @@ Local LLMs, a chat UI, vector search, and an OpenAI-compatible API, wired togeth
 [![Docker Compose v2](https://img.shields.io/badge/Docker%20Compose-v2-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 [![License: MIT](https://img.shields.io/github/license/rasidi3112/pondok-ai?color=blue)](./LICENSE)
 
-**English** · [Bahasa Indonesia](README_id.md) · [한국어](README_ko.md) · [العربية](README_ar.md) · [Español](README_es.md) · [中文](README_zh.md) · [Français](README_fr.md) · [日本語](README_ja.md) · [Deutsch](README_de.md) · [Português](README_pt.md) · [Русский](README_ru.md) · [हिन्दी](README_hi.md) · [Türkçe](README_tr.md) · [Italiano](README_it.md) · [Tiếng Việt](README_vi.md)
+**English** · [Bahasa Indonesia](README_id.md) · [한국어](README_ko.md) · [العربية](README_ar.md) · [Español](README_es.md) · [中文](README_zh.md) · [Français](README_fr.md) · [日本語](README_ja.md) · [Deutsch](README_de.md) · [Português](README_pt.md) · [Русский](README_ru.md) · [हिन्दी](README_hi.md) · [Türkçe](README_tr.md) · [Italiano](README_it.md) · [Tiếng Việt](README_vi.md) · [Polski](README_pl.md) · [Bahasa Melayu](README_ms.md)
 
 <sub>Translations are machine-generated and may lag behind the English README.</sub>
 
@@ -27,7 +27,7 @@ Local LLMs, a chat UI, vector search, and an OpenAI-compatible API, wired togeth
 
 <br>
 
-[Quickstart](#quickstart) · [Features](#features) · [Screenshots](#screenshots) · [Presets](#presets) · [CLI](#cli-commands) · [API Gateway](#api-gateway) · [Docs](#documentation)
+[Quickstart](#quickstart) · [Features](#features) · [Screenshots](#screenshots) · [Presets](#presets) · [Share on your network](#share-on-your-network) · [CLI](#cli-commands) · [API Gateway](#api-gateway) · [Docs](#documentation)
 
 </div>
 
@@ -53,6 +53,7 @@ npx pondok-ai up
 | **Local processing** | Prompts, chats, embeddings, and inference run on your hardware. |
 | **Hardware detection** | Detects OS, architecture, RAM, disk, and GPU (Apple Metal, NVIDIA CUDA) and recommends a preset and models that fit. |
 | **Modular presets** | Scale from a lightweight chat UI (`minimal`) to a RAG stack (`standard`) or an automation pipeline (`full`). |
+| **Share on your network** | `pondok-ai share` turns one machine into a private ChatGPT for a classroom or office: everyone on the same Wi-Fi opens Open WebUI from a QR code and logs in with their own account. |
 | **OpenAI-compatible gateway** | Point the OpenAI SDKs or LangChain at `http://localhost:8000/v1` without rewriting code. |
 | **Model manager** | Pull, list, inspect, and remove models with RAM and disk safety checks before each download. |
 | **Diagnostics** | `pondok-ai doctor` checks the Docker daemon, ports, RAM, disk, and GPU before you hit problems. |
@@ -83,6 +84,9 @@ npx pondok-ai up
 ```bash
 # Recommendations based on your RAM, VRAM, and free disk
 npx pondok-ai model recommend
+
+# Only models that answer well in Bahasa Indonesia (Gemma 3, Qwen 2.5, Aya Expanse, BGE-M3)
+npx pondok-ai model recommend --lang id
 
 # Install with a pre-flight memory and disk check
 npx pondok-ai model install llama3.2:3b
@@ -141,6 +145,43 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 | **`standard`** *(default)* | Ollama, Open WebUI, PostgreSQL, Qdrant, API Gateway | 16 GB | RAG pipelines, app development, OpenAI replacement |
 | **`full`** | Standard + n8n automation engine | 16+ GB | Autonomous AI agents, visual workflow automation |
 
+## Share on your network
+
+One machine can serve a whole classroom, office, or pesantren. Everyone on the same Wi-Fi or LAN opens Open WebUI in their browser, each with their own account and chat history, while the models run on that one machine.
+
+<a href="docs/demo/classroom.mp4">
+  <img src="docs/demo/classroom.gif" alt="Classroom demo: pondok-ai share prints a QR code, a student signs up on a phone, the teacher approves, and the student chats in Indonesian" width="100%">
+</a>
+
+<sub>The teacher runs <code>pondok-ai share</code>, a student opens the link on a phone and signs up, the teacher approves the account, and the student asks a question in Indonesian. Recorded on a CPU-only machine; waiting for the model is sped up and labelled on screen.<br>
+<a href="docs/demo/classroom.mp4"><b>▶ Watch the 1080p video</b></a></sub>
+
+1. Start the stack, then open http://localhost:3000 on this machine and create the admin account.
+
+   ```bash
+   npx pondok-ai up
+   ```
+
+2. As the admin, open **Admin Panel > Settings > General**, turn on **New Sign Ups** and save. Open WebUI turns sign-ups off once the admin exists. Leave **Default User Role** at **Pending**.
+3. Share Open WebUI on the local network:
+
+   ```bash
+   npx pondok-ai share
+   ```
+
+   It prints the address for each network this machine is on, such as `http://192.168.1.20:3000`, with a QR code people can scan with their phone. On a terminal with a light background, use `npx pondok-ai share --light` so the QR code scans.
+4. People sign up from their own devices. Approve each one in **Admin Panel > Users**, and they can start chatting with the models installed on this machine.
+
+It is safe by default:
+
+- **Admin first.** `share` refuses to run until the Open WebUI admin account exists, because the first account to sign up becomes the admin.
+- **Login is always on.** New accounts wait as *pending* until the admin approves them in **Admin Panel > Users**.
+- **Only Open WebUI is shared.** The API gateway, Ollama, Qdrant, and n8n keep their bind address (`127.0.0.1` by default), so nothing without a login is exposed.
+
+While sharing, approved users can use every model installed on this machine, including ones you marked private in the Workspace. The "Account Activation Pending" screen shows the admin's name and email; turn off **Show Admin Details in Account Pending Overlay** in **Admin Panel > Settings > General** to hide them.
+
+Traffic is plain HTTP, so share only on a network you trust, not public Wi-Fi. Your OS firewall may ask to allow incoming connections the first time. Stop sharing with `npx pondok-ai share --stop`.
+
 ## Architecture
 
 ```
@@ -184,8 +225,9 @@ See the [Architecture Overview](./docs/architecture.md) for details.
 | `pondok-ai restore <path>` | Restore from a SHA-256 integrity-checked backup (not encrypted) |
 | `pondok-ai reset` | Reset stack (preserves volumes unless `--delete-data` is specified) |
 | `pondok-ai config` | Inspect or edit active configuration |
+| `pondok-ai share` | Share Open WebUI on your Wi-Fi or LAN with a QR code (`--stop` to end) |
 | `pondok-ai model list` | List downloaded models |
-| `pondok-ai model recommend` | Hardware-tailored model recommendations (RAM, VRAM, Disk) |
+| `pondok-ai model recommend` | Hardware-tailored model recommendations (RAM, VRAM, Disk); `--lang id` for Bahasa Indonesia |
 | `pondok-ai model install <name>` | Pull a new model with pre-flight resource safety checks |
 | `pondok-ai model remove <name>` | Delete an installed model |
 | `pondok-ai model status` | Inspect model resource footprints |

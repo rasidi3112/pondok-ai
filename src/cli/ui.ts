@@ -1,9 +1,11 @@
 import chalk from 'chalk';
 import boxen from 'boxen';
+import { renderUnicodeCompact } from 'uqr';
 import { RequirementCheck } from '../system/requirements.js';
 import { ServiceStatus } from '../docker/client.js';
 import { StackConfig } from '../config/schema.js';
 import { SERVICE_REGISTRY } from '../services/registry.js';
+import { getLanAddresses } from '../system/network.js';
 
 /**
  * Display the application banner.
@@ -106,12 +108,59 @@ export function showServiceUrls(config: StackConfig): void {
     console.log(`  ${chalk.bold(entry.name + ':')}  ${chalk.cyan(entry.url)}`);
   }
 
+  if (services.openwebui.enabled && config.network.lanShare) {
+    for (const address of getLanAddresses()) {
+      console.log(`  ${chalk.bold('On your network:')}  ${chalk.cyan(`http://${address}:${services.openwebui.port}`)}`);
+    }
+    console.log(chalk.gray('  Run "pondok-ai share" to show a QR code.'));
+  }
+
   console.log();
 
   if (services.api.enabled) {
     console.log(chalk.gray('  Use with OpenAI SDK:'));
     console.log(chalk.gray(`  OPENAI_BASE_URL=http://${bind}:${services.api.port}/v1\n`));
   }
+}
+
+/**
+ * Display how other devices on the local network can reach Open WebUI.
+ */
+export function showLanShare(
+  urls: string[],
+  signupEnabled: boolean | null,
+  options: { lightBackground?: boolean } = {},
+): void {
+  console.log(chalk.bold.green('\nOpen WebUI is shared on your network.\n'));
+
+  if (signupEnabled === false) {
+    // Open WebUI turns sign-ups off once the admin account exists
+    console.log(chalk.yellow.bold('  One step left: nobody can sign up yet.'));
+    console.log(chalk.yellow('  As the admin, open Admin Panel > Settings > General, turn on "New Sign Ups" and save.'));
+    console.log(chalk.yellow('  Or add each person yourself in Admin Panel > Users.\n'));
+  }
+
+  if (urls.length === 0) {
+    console.log(chalk.yellow('  No Wi-Fi or LAN address found. Connect this machine to a network and run "pondok-ai share" again.\n'));
+  } else {
+    for (const url of urls) {
+      console.log(`  ${chalk.bold('Open on any device:')}  ${chalk.cyan(url)}`);
+    }
+    console.log();
+    // The blocks are drawn in the text colour, so a light background needs the colours inverted
+    console.log(renderUnicodeCompact(urls[0], { border: 2, invert: options.lightBackground === true }));
+    console.log();
+    if (!options.lightBackground) {
+      console.log(chalk.gray('  QR code not scanning on a light terminal? Run: pondok-ai share --light\n'));
+    }
+  }
+
+  console.log(chalk.gray('  Each person signs up with their own account. New accounts wait as "pending"'));
+  console.log(chalk.gray('  until the admin approves them in Admin Panel > Users.'));
+  console.log(chalk.gray('  Approved users can chat with every model installed on this machine.'));
+  console.log(chalk.gray('  Only Open WebUI is shared. The API gateway, Ollama and Qdrant keep their bind address.'));
+  console.log(chalk.gray('  Traffic is plain HTTP, so share only on a network you trust, not public Wi-Fi.'));
+  console.log(chalk.gray('  Stop sharing with: pondok-ai share --stop\n'));
 }
 
 /**
@@ -122,6 +171,7 @@ export function showConfig(config: StackConfig): void {
   console.log(`  ${chalk.gray('Preset:')}     ${chalk.bold(config.preset)}`);
   console.log(`  ${chalk.gray('Project:')}    ${config.projectName}`);
   console.log(`  ${chalk.gray('Bind:')}       ${config.network.bindAddress}`);
+  console.log(`  ${chalk.gray('LAN share:')}  ${config.network.lanShare ? 'on (Open WebUI)' : 'off'}`);
   console.log();
   console.log(chalk.bold('  Services:'));
 

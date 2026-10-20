@@ -1,166 +1,202 @@
+<div align="center">
+
 # pondok-ai
 
-[English](README.md) · [Bahasa Indonesia](README_id.md) · [한국어](README_ko.md) · [العربية](README_ar.md) · [Español](README_es.md) · [中文](README_zh.md) · [Français](README_fr.md) · **日本語** · [Deutsch](README_de.md) · [Português](README_pt.md) · [Русский](README_ru.md) · [हिन्दी](README_hi.md) · [Türkçe](README_tr.md) · [Italiano](README_it.md) · [Tiếng Việt](README_vi.md)
+**コマンドひとつで、自分だけのプライベート AI スタックをローカルで動かす。**
 
-<p align="center">
-  <strong>1つのコマンドで独自のプライベートAIスタックをローカルで実行できます。</strong>
-</p>
+ローカル LLM、チャット UI、ベクトル検索、OpenAI 互換 API を Docker Compose でまとめて構成します。
 
-<p align="center">
-  <a href="#クイックスタート">クイックスタート</a> •
-  <a href="#機能">機能</a> •
-  <a href="#プリセット">プリセット</a> •
-  <a href="#cliコマンド">CLIコマンド</a> •
-  <a href="#apiゲートウェイ">APIゲートウェイ</a> •
-  <a href="#例">例</a> •
-  <a href="#ドキュメント">ドキュメント</a>
-</p>
+[![npm version](https://img.shields.io/npm/v/pondok-ai?logo=npm&color=cb3837)](https://www.npmjs.com/package/pondok-ai)
+[![CI](https://github.com/rasidi3112/pondok-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/rasidi3112/pondok-ai/actions/workflows/ci.yml)
+[![Node.js](https://img.shields.io/node/v/pondok-ai?logo=node.js&logoColor=white&color=339933)](https://nodejs.org)
+[![Docker Compose v2](https://img.shields.io/badge/Docker%20Compose-v2-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![License: MIT](https://img.shields.io/github/license/rasidi3112/pondok-ai?color=blue)](./LICENSE)
+
+[English](README.md) · [Bahasa Indonesia](README_id.md) · [한국어](README_ko.md) · [العربية](README_ar.md) · [Español](README_es.md) · [中文](README_zh.md) · [Français](README_fr.md) · **日本語** · [Deutsch](README_de.md) · [Português](README_pt.md) · [Русский](README_ru.md) · [हिन्दी](README_hi.md) · [Türkçe](README_tr.md) · [Italiano](README_it.md) · [Tiếng Việt](README_vi.md) · [Polski](README_pl.md) · [Bahasa Melayu](README_ms.md)
+
+<sub>翻訳は機械生成のため、英語版 README より内容が古い場合があります。</sub>
+
+<br>
+
+<a href="docs/demo/demo.mp4">
+  <img src="docs/demo/demo.gif" alt="pondok-ai のデモ：init、up のあと Open WebUI で llama3.2:3b とチャット" width="100%">
+</a>
+
+<sub>空のフォルダからローカルモデルの応答まで。CPU のみのマシンで、イメージとモデルを事前に取得した状態で収録しています。待ち時間は早送りし、画面上に表示しています。<br>
+<a href="docs/demo/demo.mp4"><b>▶ 1080p の動画を見る</b></a></sub>
+
+<br>
+
+[クイックスタート](#クイックスタート) · [機能](#機能) · [スクリーンショット](#スクリーンショット) · [プリセット](#プリセット) · [CLI](#cli-コマンド) · [API ゲートウェイ](#api-ゲートウェイ) · [ドキュメント](#ドキュメント)
+
+</div>
 
 ---
 
 ## 概要
 
-`pondok-ai`は、開発者に優しい、摩擦ゼロのCLIおよびコンテナオーケストレーションツールキットで、ローカルワークステーション上で完全なプライベートAI環境を直接起動します。
+`pondok-ai` は、完全でプライベートな AI 環境を手元のマシンで立ち上げる CLI です。ハードウェアに合わせた Docker Compose スタックを生成し、ヘルスチェック付きで起動し、モデルの管理も行います。
 
-**Docker Compose v2**を搭載し、`pondok-ai`は数秒でローカルLLM、チャットUI、ベクトル検索、データベース永続化、OpenAI互換APIゲートウェイを提供します。プロンプト、チャット、埋め込みはマシン上で処理されます。コンテナイメージとモデルウェイトのプルにはインターネット接続が必要です。
+プロンプト、チャット、埋め込みはすべてあなたのマシン上で処理されます。コンテナイメージとモデルの重みを初めて取得する際にはインターネット接続が必要です。
 
 ```bash
 npx pondok-ai init
 npx pondok-ai up
 ```
 
----
+<sub>Pondok はインドネシア語で小さな小屋や宿を意味します。このパッケージは以前 `local-ai-stack` という名前で公開されていました。</sub>
 
 ## 機能
 
--  **ローカル処理**:プロンプト、チャット、埋め込み、推論はハードウェア上で実行されます。初回のコンテナイメージプルとモデルダウンロードにはインターネットアクセスが必要です。
-- ⚡ **ゼロセットアップ摩擦**:OS、アーキテクチャ、RAM、GPU(Apple Metal / NVIDIA CUDA)を自動検出します。
--  **モジュラープリセット**:軽量チャットインターフェース(`minimal`)からエンタープライズRAGスタック(`standard`)、自律自動化パイプライン(`full`)までスケールします。
--  **OpenAI互換ゲートウェイ**:標準のOpenAI SDKまたはLangChainを`http://localhost:8000/v1`に直接向け、コードの書き換えは不要です。
--  **組み込みモデルマネージャー**:組み込みのRAM/ディスク安全警告付きでモデルをプル、リスト、検査、削除します。
--  **自己修復診断**:組み込みの`doctor`コマンドが、問題に遭遇する前にポート衝突、Dockerデーモンステータス、リソース制限を診断します。
+| | |
+|---|---|
+| **ローカル処理** | プロンプト、チャット、埋め込み、推論はすべて手元のハードウェアで実行されます。 |
+| **ハードウェア検出** | OS、アーキテクチャ、RAM、ディスク、GPU（Apple Metal、NVIDIA CUDA）を検出し、適したプリセットとモデルを提案します。 |
+| **モジュール式プリセット** | 軽量なチャット UI（`minimal`）から RAG スタック（`standard`）、自動化パイプライン（`full`）まで拡張できます。 |
+| **OpenAI 互換ゲートウェイ** | OpenAI SDK や LangChain の接続先を `http://localhost:8000/v1` に変えるだけで、コードを書き換える必要はありません。 |
+| **モデルマネージャー** | モデルの取得、一覧表示、確認、削除ができ、ダウンロードの前には毎回 RAM とディスクの安全チェックを行います。 |
+| **診断** | `pondok-ai doctor` が Docker デーモン、ポート、RAM、ディスク、GPU を事前にチェックし、問題を未然に防ぎます。 |
+| **バックアップ** | 設定とデータボリュームを SHA-256 の整合性チェック付きでバックアップ・復元できます。 |
 
----
+## クイックスタート
+
+**前提条件:** Node.js 22 以降、Docker、Docker Compose v2。
+
+**1. スタックを初期化する**
+
+```bash
+# ハードウェア検出付きの対話型セットアップウィザード
+npx pondok-ai init
+
+# または、プリセットを指定して非対話で実行
+npx pondok-ai init --preset standard --yes
+```
+
+**2. サービスを起動する**（すべてのサービスが正常になるまで待機します）
+
+```bash
+npx pondok-ai up
+```
+
+**3. モデルを選んでインストールする**
+
+```bash
+# RAM、VRAM、空きディスク容量に基づくおすすめ
+npx pondok-ai model recommend
+
+# メモリとディスクを事前チェックしてからインストール
+npx pondok-ai model install llama3.2:3b
+```
+
+起動したら、スタックを開きます。
+
+| サービス | URL |
+|---|---|
+| Open WebUI | [http://localhost:3000](http://localhost:3000) |
+| API ゲートウェイ | [http://localhost:8000](http://localhost:8000) |
+| Ollama | [http://localhost:11434](http://localhost:11434) |
+| Qdrant | [http://localhost:6333/dashboard](http://localhost:6333/dashboard) *（ポートを公開している場合）* |
+
+<details>
+<summary><b>インストールスクリプト</b>（実験的、CI の対象外）</summary>
+
+**macOS と Linux**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/install.sh | bash
+```
+
+**Windows (PowerShell)**
+
+```powershell
+iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/install.ps1 | iex
+```
+
+</details>
+
+## スクリーンショット
+
+<p align="center">
+  <img src="docs/demo/screenshots/chat.png" alt="ローカルで動作する llama3.2:3b を使って質問に答える Open WebUI" width="100%">
+  <br>
+  <sub>ローカルの Ollama コンテナが提供する <code>llama3.2:3b</code> と Open WebUI でチャットしている様子。</sub>
+</p>
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/demo/screenshots/doctor.png" alt="pondok-ai doctor の出力：システム情報、Docker の状態、要件チェック"></td>
+    <td width="50%"><img src="docs/demo/screenshots/model-recommend.png" alt="pondok-ai model recommend の出力：このマシンで動くモデル、ぎりぎり動くモデル、動かないモデル"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><code>pondok-ai doctor</code> が Docker、RAM、ディスク、GPU をチェック</sub></td>
+    <td align="center"><sub><code>pondok-ai model recommend</code> がハードウェアで動かせるかどうかでモデルを並べ替え</sub></td>
+  </tr>
+</table>
+
+## プリセット
+
+| プリセット | 含まれるサービス | 最小 RAM | おすすめの用途 |
+|---|---|---|---|
+| **`minimal`** | Ollama, Open WebUI | 8 GB | 手軽なローカルチャット、軽い実験 |
+| **`standard`** *（デフォルト）* | Ollama, Open WebUI, PostgreSQL, Qdrant, API Gateway | 16 GB | RAG パイプライン、アプリ開発、OpenAI の代替 |
+| **`full`** | Standard + n8n 自動化エンジン | 16+ GB | 自律型 AI エージェント、ビジュアルなワークフロー自動化 |
 
 ## アーキテクチャ
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
-│                  ホストマシン (CLI)                            │
+│                      Host Machine (CLI)                       │
 │                                                               │
-│   ポート 3000           ポート 8000         ポート 5678        │
-│       │                     │                   │             │
-└───────┼─────────────────────┼───────────────────┼─────────────┘
-        ▼                     ▼                   ▼
-  ┌───────────┐         ┌───────────┐       ┌───────────┐
-  │ Open      │         │ API       │       │ n8n       │
-  │ WebUI     │         │ ゲートウェイ│       │ (Full)    │
-  └─────┬─────┘         └─────┬─────┘       └─────┬─────┘
-        │                     │                   │
-        ├─────────────────────┼───────────────────┤
-        ▼                     ▼                   ▼
-  ┌───────────┐         ┌───────────┐       ┌───────────┐
-  │ Ollama    │         │ Qdrant    │       │ Postgres  │
-  │ (LLMs)    │         │ (ベクトル)│       │ (状態)    │
-  └───────────┘         └───────────┘       └───────────┘
+│   Port 3000                 Port 8000           Port 5678     │
+│       │                         │                   │         │
+└───────┼─────────────────────────┼───────────────────┼─────────┘
+        ▼                         ▼                   ▼
+  ┌───────────┐             ┌───────────┐       ┌───────────┐
+  │ Open      │             │ API       │       │ n8n       │
+  │ WebUI     │             │ Gateway   │       │ (Full)    │
+  └─────┬─────┘             └─────┬─────┘       └─────┬─────┘
+        │                         │                   │
+        ├─────────────────────────┼───────────────────┤
+        ▼                         ▼                   ▼
+  ┌───────────┐             ┌───────────┐       ┌───────────┐
+  │ Ollama    │             │ Qdrant    │       │ Postgres  │
+  │ (LLMs)    │             │ (Vector)  │       │ (State)   │
+  └───────────┘             └───────────┘       └───────────┘
 ```
 
----
+詳しくは[アーキテクチャ概要](./docs/architecture.md)をご覧ください。
 
-## プリセット
-
-| プリセット | 含まれるサービス | 最小RAM | 推奨用途 |
-|---|---|---|---|
-| **`minimal`** | Ollama, Open WebUI | 8 GB | クイックローカルチャット、軽量実験 |
-| **`standard`** *(デフォルト)* | Ollama, Open WebUI, PostgreSQL, Qdrant, APIゲートウェイ | 16 GB | RAGパイプライン、アプリ開発、OpenAI代替 |
-| **`full`** | Standard + n8n自動化エンジン | 16+ GB | 自律AIエージェント、ビジュアルワークフロー自動化 |
-
----
-
-## クイックスタート
-
-### 自動ワンコマンドインストール
-
-#### macOSとLinux
-```bash
-curl -fsSL https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/install.sh | bash
-```
-
-#### Windows (PowerShell)
-```powershell
-iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/install.ps1 | iex
-```
-
-### npx経由の手動クイックスタート
-
-前提条件:Node.js 22以降、Docker、およびDocker Compose v2。
-
-#### 1. スタックを初期化
-```bash
-# ハードウェア自動検出付きインタラクティブセットアップウィザード
-npx pondok-ai init
-
-# または選択したプリセットで非インタラクティブ
-npx pondok-ai init --preset standard --yes
-```
-
-#### 2. 自動ヘルスチェック付きでサービスを起動
-```bash
-npx pondok-ai up
-```
-
-実行中は、スタックにアクセスします:
-- **Open WebUI**: [http://localhost:3000](http://localhost:3000)
-- **APIゲートウェイ**: [http://localhost:8000](http://localhost:8000)
-- **Ollama**: [http://localhost:11434](http://localhost:11434)
-- **Qdrant**: [http://localhost:6333/dashboard](http://localhost:6333/dashboard) *(マップ時)*
-
-#### 3. スマートハードウェア検出とモデル推奨
-```bash
-# RAM/VRAMに基づくスマートなハードウェア対応推奨を取得
-npx pondok-ai model recommend
-
-# プリフライトメモリとディスク安全チェック付きでモデルをインストール
-npx pondok-ai model install llama3.2:3b
-```
-
----
-
-## CLIコマンド
+## CLI コマンド
 
 | コマンド | 説明 |
 |---|---|
-| `pondok-ai init` | ハードウェア検出付きインタラクティブ構成ウィザードを実行 |
-| `pondok-ai up` | Compose構成を検証し、コンテナを起動し、ヘルスチェックを待機 |
-| `pondok-ai down` | スタックコンテナを停止して削除 |
-| `pondok-ai start` | 既存の停止したコンテナを起動 |
+| `pondok-ai init` | ハードウェア検出付きの対話型設定ウィザードを実行 |
+| `pondok-ai up` | Compose 設定を検証し、コンテナを起動してヘルスチェックを待機 |
+| `pondok-ai down` | スタックのコンテナを停止して削除 |
+| `pondok-ai start` | 停止中の既存コンテナを起動 |
 | `pondok-ai stop` | 実行中のコンテナを停止 |
-| `pondok-ai restart` | スタックコンテナを再起動 |
-| `pondok-ai status` | コンテナの健全性とURLを表示 |
-| `pondok-ai logs [サービス]` | ログを表示(`-f`でストリーム) |
-| `pondok-ai doctor` | Docker、RAM、GPU/VRAM、ポート、モデル推奨を診断 |
-| `pondok-ai update` | 構成されたピン留めイメージを自動バックアップとヘルスチェック付きで再プル |
-| `pondok-ai backup` | SHA-256整合性チェック付きで構成とデータボリュームをバックアップ(暗号化なし) |
-| `pondok-ai restore <パス>` | SHA-256整合性チェック済みバックアップから復元(暗号化なし) |
-| `pondok-ai reset` | スタックをリセット(`--delete-data`が指定されない限りボリュームを保持) |
-| `pondok-ai config` | アクティブ構成を検査または編集 |
-| `pondok-ai model list` | ダウンロードされたモデルをリスト |
-| `pondok-ai model recommend` | ハードウェアに合わせたモデル推奨(RAM、VRAM、ディスク) |
-| `pondok-ai model install <名前>` | プリフライトリソース安全チェック付きで新しいモデルをプル |
-| `pondok-ai model remove <名前>` | インストールされたモデルを削除 |
-| `pondok-ai model status` | モデルリソースフットプリントを検査 |
+| `pondok-ai restart` | スタックのコンテナを再起動 |
+| `pondok-ai status` | コンテナの状態と URL を表示 |
+| `pondok-ai logs [service]` | ログを表示（`-f` でストリーム表示） |
+| `pondok-ai doctor` | Docker、RAM、GPU/VRAM、ポートを診断し、モデルを提案 |
+| `pondok-ai update` | 設定済みの固定バージョンのイメージを再取得（自動バックアップとヘルスチェック付き） |
+| `pondok-ai backup` | 設定とデータボリュームを SHA-256 整合性チェック付きでバックアップ（暗号化なし） |
+| `pondok-ai restore <path>` | SHA-256 で整合性を確認したバックアップから復元（暗号化なし） |
+| `pondok-ai reset` | スタックをリセット（`--delete-data` を指定しない限りボリュームは保持） |
+| `pondok-ai config` | 現在の設定を確認・編集 |
+| `pondok-ai model list` | ダウンロード済みのモデルを一覧表示 |
+| `pondok-ai model recommend` | ハードウェアに合わせたモデルの提案（RAM、VRAM、ディスク） |
+| `pondok-ai model install <name>` | リソースの事前安全チェック付きで新しいモデルを取得 |
+| `pondok-ai model remove <name>` | インストール済みのモデルを削除 |
+| `pondok-ai model status` | モデルのリソース使用量を確認 |
 
-イメージは明示的なバージョンにピン留めされています。`pondok-ai update`は構成されたバージョンを更新します。新しいリリースは選択しません。新しいCLIをインストールした後、`pondok-ai update --upgrade-images`を実行して、CLIのレガシーデフォルトイメージタグのみを移行します。カスタムイメージ値は保持されます。
+イメージは明示的なバージョンに固定されています。`pondok-ai update` は設定済みのバージョンを更新するだけで、新しいリリースを選ぶことはありません。新しい CLI をインストールしたあとは、`pondok-ai update --upgrade-images` を実行すると CLI の旧デフォルトイメージタグだけが移行されます。カスタムのイメージ指定はそのまま保持されます。
 
----
+## API ゲートウェイ
 
-## APIゲートウェイ
+API ゲートウェイは、そのまま置き換えて使える OpenAI の REST エンドポイントを提供します。`/v1/*` エンドポイントを呼び出す前に、`PONDOK_AI_API_KEY` に生成された `API_SECRET_KEY` を設定してください。
 
-APIゲートウェイは、ドロップインOpenAI RESTエンドポイントを提供します:
-
-`/v1/*`エンドポイントを呼び出す前に、`PONDOK_AI_API_KEY`を生成された`API_SECRET_KEY`に設定してください。
-
-ゲートウェイは、デフォルトでソースIPごとの認証済み`/v1/*`リクエストを毎分120リクエストに制限します。ローカルクライアントが異なる制限を必要とする場合は、`.env`で`RATE_LIMIT_MAX_REQUESTS`と`RATE_LIMIT_WINDOW_MS`を構成してください。
+ゲートウェイは、認証済みの `/v1/*` リクエストをデフォルトでクライアント（送信元 IP と API キー）ごとに毎分 120 件に制限します。ローカルのクライアントで別の上限が必要な場合は、`.env` の `RATE_LIMIT_MAX_REQUESTS` と `RATE_LIMIT_WINDOW_MS` を設定してください。
 
 ```bash
 curl http://localhost:8000/v1/chat/completions \
@@ -169,18 +205,20 @@ curl http://localhost:8000/v1/chat/completions \
   -d '{
     "model": "llama3.2:3b",
     "messages": [
-      { "role": "user", "content": "プライベートローカルAIスタックからこんにちは!" }
+      { "role": "user", "content": "Hello from pondok-ai!" }
     ]
   }'
 ```
 
-### 公式OpenAI Node.js SDKでの使用
+<details>
+<summary><b>公式 OpenAI Node.js SDK を使う</b></summary>
+
 ```typescript
 import OpenAI from 'openai';
 
 const apiKey = process.env.PONDOK_AI_API_KEY;
 if (!apiKey) {
-  throw new Error('PONDOK_AI_API_KEYを生成されたAPI_SECRET_KEYに設定してください。');
+  throw new Error('Set PONDOK_AI_API_KEY to your generated API_SECRET_KEY.');
 }
 
 const openai = new OpenAI({
@@ -190,35 +228,45 @@ const openai = new OpenAI({
 
 const completion = await openai.chat.completions.create({
   model: 'llama3.2:3b',
-  messages: [{ role: 'user', content: '量子コンピューティングを1文で説明してください。' }],
+  messages: [{ role: 'user', content: 'Explain quantum computing in one sentence.' }],
 });
 
 console.log(completion.choices[0].message.content);
 ```
 
----
+</details>
 
-## 例
+すべてのエンドポイントは [API ゲートウェイリファレンス](./docs/api-reference.md)をご覧ください。
 
-- [`examples/openai-compat/`](./examples/openai-compat):ドロップインOpenAI SDK統合スクリプト。
-- [`examples/rag-example/`](./examples/rag-example):Qdrantベクトルデータベースとollama埋め込みを使用したエンドツーエンドRAGパイプライン。
+## サンプル
 
----
+- [`examples/openai-compat/`](./examples/openai-compat)：OpenAI SDK をそのまま置き換えて使う統合スクリプト。
+- [`examples/rag-example/`](./examples/rag-example)：Qdrant ベクトルデータベースと Ollama の埋め込みを使ったエンドツーエンドの RAG パイプライン。
+
+## CI でのテスト
+
+すべてのプルリクエストで GitHub Actions（amd64 と arm64）のエンドツーエンドテストを実行します：init、up、ごく小さなモデル（smollm:135m、約 90 MB）の取得、/v1/models での一覧表示、ストリーミングなしの /v1/chat/completions リクエスト、レート制限（401 と 429）、そして Open WebUI のスタートページが応答するかの確認です。まだ対象外：ストリーミング応答、埋め込み、GPU アクセラレーション、macOS/Windows ホスト。
+
+## 既知の制限事項
+
+- 実機の macOS や Windows ホストではまだテストしていません。
+- Apple Silicon では Docker コンテナから GPU を使えません。`pondok-ai init --native-ollama` を実行すると、代わりにネイティブインストールした Metal 対応の Ollama を使えます。詳しくは [GPU ガイド](./docs/gpu-setup.md)をご覧ください。
+- GPU アクセラレーション、ストリーミング応答、埋め込みはまだ CI の対象外です。
+- イメージは大きめ（数 GB）です。十分な空きディスク容量を確保してください。空き 19 GB の 32 GB クラウドワークスペースでは、Ollama イメージの展開中に容量が足りなくなりました。
 
 ## ドキュメント
 
 - [アーキテクチャ概要](./docs/architecture.md)
-- [APIゲートウェイリファレンス](./docs/api-reference.md)
-- [構成ガイド](./docs/configuration.md)
-- [GPUアクセラレーションセットアップ(Metal / CUDA)](./docs/gpu-setup.md)
+- [API ゲートウェイリファレンス](./docs/api-reference.md)
+- [設定ガイド](./docs/configuration.md)
+- [GPU アクセラレーションの設定（Metal / CUDA）](./docs/gpu-setup.md)
 - [トラブルシューティングと診断](./docs/troubleshooting.md)
+- [README デモの収録方法](./docs/demo/RECORDING.md)
 
----
+## コントリビューション
 
-## 貢献
-
-貢献を歓迎します![CONTRIBUTING.md](./CONTRIBUTING.md)を確認して始めてください。
+コントリビューションを歓迎します！まずは [CONTRIBUTING.md](./CONTRIBUTING.md) をご覧ください。
 
 ## ライセンス
 
-[MIT](./LICENSE) © 2026 pondok-aiコントリビューター
+[MIT](./LICENSE) © 2026 pondok-ai contributors
