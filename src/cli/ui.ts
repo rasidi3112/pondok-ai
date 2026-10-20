@@ -126,8 +126,19 @@ export function showServiceUrls(config: StackConfig): void {
 /**
  * Display how other devices on the local network can reach Open WebUI.
  */
-export function showLanShare(urls: string[], signupEnabled: boolean | null): void {
+export function showLanShare(
+  urls: string[],
+  signupEnabled: boolean | null,
+  options: { lightBackground?: boolean } = {},
+): void {
   console.log(chalk.bold.green('\nOpen WebUI is shared on your network.\n'));
+
+  if (signupEnabled === false) {
+    // Open WebUI turns sign-ups off once the admin account exists
+    console.log(chalk.yellow.bold('  One step left: nobody can sign up yet.'));
+    console.log(chalk.yellow('  As the admin, open Admin Panel > Settings > General, turn on "New Sign Ups" and save.'));
+    console.log(chalk.yellow('  Or add each person yourself in Admin Panel > Users.\n'));
+  }
 
   if (urls.length === 0) {
     console.log(chalk.yellow('  No Wi-Fi or LAN address found. Connect this machine to a network and run "pondok-ai share" again.\n'));
@@ -136,15 +147,17 @@ export function showLanShare(urls: string[], signupEnabled: boolean | null): voi
       console.log(`  ${chalk.bold('Open on any device:')}  ${chalk.cyan(url)}`);
     }
     console.log();
-    console.log(renderUnicodeCompact(urls[0], { border: 2 }));
+    // The blocks are drawn in the text colour, so a light background needs the colours inverted
+    console.log(renderUnicodeCompact(urls[0], { border: 2, invert: options.lightBackground === true }));
     console.log();
+    if (!options.lightBackground) {
+      console.log(chalk.gray('  QR code not scanning on a light terminal? Run: pondok-ai share --light\n'));
+    }
   }
 
   console.log(chalk.gray('  Each person signs up with their own account. New accounts wait as "pending"'));
   console.log(chalk.gray('  until the admin approves them in Admin Panel > Users.'));
-  if (signupEnabled === false) {
-    console.log(chalk.yellow('  Sign-ups are turned off. Turn them on in Admin Panel > Settings > General, or add users yourself.'));
-  }
+  console.log(chalk.gray('  Approved users can chat with every model installed on this machine.'));
   console.log(chalk.gray('  Only Open WebUI is shared. The API gateway, Ollama and Qdrant keep their bind address.'));
   console.log(chalk.gray('  Traffic is plain HTTP, so share only on a network you trust, not public Wi-Fi.'));
   console.log(chalk.gray('  Stop sharing with: pondok-ai share --stop\n'));

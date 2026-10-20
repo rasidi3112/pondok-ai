@@ -149,21 +149,29 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 
 One machine can serve a whole classroom, office, or pesantren. Everyone on the same Wi-Fi or LAN opens Open WebUI in their browser, each with their own account and chat history, while the models run on that one machine.
 
-```bash
-# 1. Start the stack and create the admin account at http://localhost:3000
-npx pondok-ai up
+1. Start the stack, then open http://localhost:3000 on this machine and create the admin account.
 
-# 2. Share Open WebUI on the local network and print a QR code
-npx pondok-ai share
-```
+   ```bash
+   npx pondok-ai up
+   ```
 
-`share` prints the address for each network this machine is on, such as `http://192.168.1.20:3000`, with a QR code people can scan with their phone.
+2. As the admin, open **Admin Panel > Settings > General**, turn on **New Sign Ups** and save. Open WebUI turns sign-ups off once the admin exists. Leave **Default User Role** at **Pending**.
+3. Share Open WebUI on the local network:
+
+   ```bash
+   npx pondok-ai share
+   ```
+
+   It prints the address for each network this machine is on, such as `http://192.168.1.20:3000`, with a QR code people can scan with their phone. On a terminal with a light background, use `npx pondok-ai share --light` so the QR code scans.
+4. People sign up from their own devices. Approve each one in **Admin Panel > Users**, and they can start chatting with the models installed on this machine.
 
 It is safe by default:
 
 - **Admin first.** `share` refuses to run until the Open WebUI admin account exists, because the first account to sign up becomes the admin.
 - **Login is always on.** New accounts wait as *pending* until the admin approves them in **Admin Panel > Users**.
 - **Only Open WebUI is shared.** The API gateway, Ollama, Qdrant, and n8n keep their bind address (`127.0.0.1` by default), so nothing without a login is exposed.
+
+While sharing, approved users can use every model installed on this machine, including ones you marked private in the Workspace. The "Account Activation Pending" screen shows the admin's name and email; turn off **Show Admin Details in Account Pending Overlay** in **Admin Panel > Settings > General** to hide them.
 
 Traffic is plain HTTP, so share only on a network you trust, not public Wi-Fi. Your OS firewall may ask to allow incoming connections the first time. Stop sharing with `npx pondok-ai share --stop`.
 

@@ -116,8 +116,14 @@ export function generateComposeFile(config: StackConfig, _env?: GeneratedEnv): s
       volumes: ['openwebui-data:/app/backend/data'],
       environment: {
         OLLAMA_BASE_URL: ollamaUrl,
-        // Never let a shared Open WebUI run without login
-        ...(lanShare && { WEBUI_AUTH: 'True' }),
+        // Keep the session signing key in the data volume, so recreating the container keeps people logged in
+        WEBUI_SECRET_KEY_FILE: '/app/backend/data/.webui_secret_key',
+        ...(lanShare && {
+          // Never let a shared Open WebUI run without login
+          WEBUI_AUTH: 'True',
+          // Ollama models are admin-only until made public; approved users need them to chat
+          BYPASS_MODEL_ACCESS_CONTROL: 'True',
+        }),
       },
       networks: ['pondok-ai-network'],
       depends_on: {

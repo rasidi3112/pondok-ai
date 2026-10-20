@@ -37,6 +37,16 @@ describe('LAN share', () => {
 
       expect(compose.services.openwebui.ports).toEqual(['127.0.0.1:3000:8080']);
       expect(compose.services.openwebui.environment?.WEBUI_AUTH).toBeUndefined();
+      expect(compose.services.openwebui.environment?.BYPASS_MODEL_ACCESS_CONTROL).toBeUndefined();
+    });
+
+    it('keeps the Open WebUI session key in the data volume', () => {
+      const config = getDefaultConfig('minimal');
+      const compose = yamlLoad(generateComposeFile(config)) as ParsedCompose;
+
+      expect(compose.services.openwebui.environment?.WEBUI_SECRET_KEY_FILE).toBe(
+        '/app/backend/data/.webui_secret_key',
+      );
     });
 
     it('publishes only Open WebUI on all interfaces, with login forced on', () => {
@@ -46,6 +56,7 @@ describe('LAN share', () => {
 
       expect(compose.services.openwebui.ports).toEqual(['0.0.0.0:3000:8080']);
       expect(compose.services.openwebui.environment?.WEBUI_AUTH).toBe('True');
+      expect(compose.services.openwebui.environment?.BYPASS_MODEL_ACCESS_CONTROL).toBe('True');
       expect(compose.services.ollama.ports).toEqual(['127.0.0.1:11434:11434']);
       expect(compose.services.qdrant.ports).toEqual(['127.0.0.1:6333:6333']);
       expect(compose.services.api.ports).toEqual(['127.0.0.1:8000:8000']);

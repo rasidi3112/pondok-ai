@@ -49,6 +49,7 @@ describe('CLI Help', () => {
     expect(output).toContain('local network');
     expect(output).toContain('--stop');
     expect(output).toContain('--yes');
+    expect(output).toContain('--light');
   });
 
   it('should display help for init command', () => {

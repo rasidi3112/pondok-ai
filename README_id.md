@@ -149,21 +149,29 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 
 Satu komputer bisa melayani satu kelas, kantor, atau pesantren. Semua orang yang tersambung ke WiFi atau LAN yang sama membuka Open WebUI di browser, masing-masing dengan akun dan riwayat chat sendiri, sementara modelnya berjalan di satu komputer itu.
 
-```bash
-# 1. Nyalakan stack dan buat akun admin di http://localhost:3000
-npx pondok-ai up
+1. Nyalakan stack, lalu buka http://localhost:3000 di komputer ini dan buat akun admin.
 
-# 2. Bagikan Open WebUI ke jaringan lokal dan tampilkan QR code
-npx pondok-ai share
-```
+   ```bash
+   npx pondok-ai up
+   ```
 
-`share` menampilkan alamat untuk setiap jaringan yang tersambung, misalnya `http://192.168.1.20:3000`, beserta QR code yang bisa dipindai dengan ponsel.
+2. Sebagai admin, buka **Admin Panel > Settings > General**, aktifkan **New Sign Ups**, lalu simpan. Open WebUI mematikan pendaftaran begitu akun admin dibuat. Biarkan **Default User Role** tetap **Pending**.
+3. Bagikan Open WebUI ke jaringan lokal:
+
+   ```bash
+   npx pondok-ai share
+   ```
+
+   Perintah ini menampilkan alamat untuk setiap jaringan yang tersambung, misalnya `http://192.168.1.20:3000`, beserta QR code yang bisa dipindai dengan ponsel. Di terminal berlatar terang, pakai `npx pondok-ai share --light` agar QR code bisa dipindai.
+4. Orang-orang mendaftar dari perangkat masing-masing. Setujui satu per satu di **Admin Panel > Users**, lalu mereka bisa langsung chat dengan model yang terpasang di komputer ini.
 
 Aman secara default:
 
 - **Admin dulu.** `share` menolak berjalan sebelum akun admin Open WebUI dibuat, karena akun pertama yang mendaftar menjadi admin.
 - **Login selalu aktif.** Akun baru berstatus *pending* sampai admin menyetujuinya di **Admin Panel > Users**.
 - **Hanya Open WebUI yang dibagikan.** API gateway, Ollama, Qdrant, dan n8n tetap memakai bind address (`127.0.0.1` secara default), jadi tidak ada layanan tanpa login yang terbuka.
+
+Selama berbagi, pengguna yang sudah disetujui bisa memakai semua model yang terpasang di komputer ini, termasuk yang Anda tandai privat di Workspace. Layar "Account Activation Pending" menampilkan nama dan email admin; matikan **Show Admin Details in Account Pending Overlay** di **Admin Panel > Settings > General** untuk menyembunyikannya.
 
 Lalu lintasnya HTTP biasa, jadi bagikan hanya di jaringan yang dipercaya, bukan WiFi publik. Firewall sistem operasi mungkin meminta izin koneksi masuk saat pertama kali. Hentikan dengan `npx pondok-ai share --stop`.
 

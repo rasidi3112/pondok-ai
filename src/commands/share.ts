@@ -15,6 +15,7 @@ interface ShareOptions {
   dir?: string;
   stop?: boolean;
   yes?: boolean;
+  light?: boolean;
 }
 
 export function createShareCommand(): Command {
@@ -22,6 +23,7 @@ export function createShareCommand(): Command {
     .description('Share Open WebUI with other devices on your local network (Wi-Fi or LAN)')
     .option('--stop', 'Stop sharing and make Open WebUI reachable from this machine only')
     .option('-y, --yes', 'Continue when the Open WebUI admin account cannot be verified')
+    .option('--light', 'Draw the QR code for a terminal with a light background')
     .option('-d, --dir <directory>', 'Working directory', process.cwd())
     .action(async (options: ShareOptions) => {
       await runShare(options);
@@ -109,15 +111,15 @@ async function runShare(options: ShareOptions): Promise<void> {
     process.exit(1);
   }
 
-  if (!config.network.lanShare) {
-    config.network.lanShare = true;
-    await applyConfig(configManager, config, docker, 'Publishing Open WebUI on your network...');
-  }
+  // Applied even when already shared, so a newer CLI's share settings reach the container
+  config.network.lanShare = true;
+  await applyConfig(configManager, config, docker, 'Publishing Open WebUI on your network...');
 
   const addresses = getLanAddresses();
   showLanShare(
     addresses.map((address) => `http://${address}:${port}`),
     account.state === 'ready' ? account.signupEnabled : null,
+    { lightBackground: options.light === true },
   );
 
   if (config.network.bindAddress === '0.0.0.0') {
