@@ -1,28 +1,75 @@
 version: 2
 updates:
+  # CLI (published to npm)
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+      day: monday
     groups:
-      dev-dependencies:
+      runtime-minor-patch:
+        dependency-type: production
+        update-types: [minor, patch]
+      dev-minor-patch:
         dependency-type: development
         update-types: [minor, patch]
+      dev-major:
+        dependency-type: development
+        update-types: [major]
+    ignore:
+      # Major upgrades of runtime dependencies change what users install,
+      # so they are done by hand with the full E2E suite.
+      - dependency-name: boxen
+        update-types: [version-update:semver-major]
+      - dependency-name: chalk
+        update-types: [version-update:semver-major]
+      - dependency-name: commander
+        update-types: [version-update:semver-major]
+      - dependency-name: inquirer
+        update-types: [version-update:semver-major]
+      - dependency-name: js-yaml
+        update-types: [version-update:semver-major]
+      - dependency-name: ora
+        update-types: [version-update:semver-major]
+      - dependency-name: uqr
+        update-types: [version-update:semver-major]
+      # Keep the Node types on the minimum supported Node (engines >= 22).
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
+      # TypeScript majors need a planned migration.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
     open-pull-requests-limit: 5
 
+  # API gateway (built into the Docker image)
   - package-ecosystem: npm
     directory: /api
     schedule:
       interval: weekly
+      day: monday
     groups:
       gateway-minor-patch:
         update-types: [minor, patch]
+    ignore:
+      - dependency-name: fastify
+        update-types: [version-update:semver-major]
+      - dependency-name: '@fastify/*'
+        update-types: [version-update:semver-major]
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
     open-pull-requests-limit: 5
 
+  # Gateway base image: stay on the Node 22 LTS line.
   - package-ecosystem: docker
     directory: /api
     schedule:
       interval: weekly
+      day: monday
+    ignore:
+      - dependency-name: node
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /
