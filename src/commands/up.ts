@@ -3,7 +3,10 @@ import ora from 'ora';
 import { ConfigManager } from '../config/manager.js';
 import { findInvalidRequiredSecrets } from '../config/secrets.js';
 import { DockerClient } from '../docker/client.js';
+import { checkHttpEndpoint } from '../docker/health.js';
+import { isNativeOllama } from '../system/ollama-native.js';
 import { showBanner, showServiceUrls, showError } from '../cli/ui.js';
+import { logger } from '../utils/logger.js';
 
 interface UpOptions {
   dir?: string;
@@ -46,6 +49,15 @@ async function runUp(options: UpOptions): Promise<void> {
       'Run "pondok-ai init" to generate secure credentials before starting the stack.',
     );
     process.exit(1);
+  }
+
+  if (isNativeOllama(config)) {
+    const port = config.services.ollama.port ?? 11434;
+    const probe = await checkHttpEndpoint(`http://127.0.0.1:${port}/`, 2000);
+    if (!probe.ok) {
+      logger.warn(`Native Ollama is not reachable on port ${port}.`);
+      logger.raw('  Start it with "ollama serve" or open the Ollama app, then run "pondok-ai up" again if needed.\n');
+    }
   }
 
   const docker = new DockerClient(

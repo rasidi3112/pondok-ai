@@ -6,6 +6,9 @@ import { DockerClient } from '../docker/client.js';
 import { showError, showSuccess } from '../cli/ui.js';
 import { logger } from '../utils/logger.js';
 import { isValidModelName } from '../utils/validation.js';
+import { exec } from '../utils/exec.js';
+import { StackConfig } from '../config/schema.js';
+import { isNativeOllama } from '../system/ollama-native.js';
 
 interface ModelOptions {
   dir?: string;
@@ -79,11 +82,26 @@ function getDockerClient(options: ModelOptions): { docker: DockerClient; config:
   return { docker, config };
 }
 
+/**
+ * Run an `ollama` subcommand, either on the host (native) or inside the container.
+ */
+async function runOllama(
+  docker: DockerClient,
+  config: StackConfig | null,
+  args: string[],
+): Promise<{ stdout: string; exitCode: number }> {
+  if (config && isNativeOllama(config)) {
+    const result = await exec('ollama', args, { timeout: 60000 });
+    return { stdout: result.stdout || result.stderr, exitCode: result.exitCode };
+  }
+  return docker.execInContainer('ollama', ['ollama', ...args]);
+}
+
 async function listModels(options: ModelOptions): Promise<void> {
-  const { docker } = getDockerClient(options);
+  const { docker, config } = getDockerClient(options);
 
   try {
-    const result = await docker.execInContainer('ollama', ['ollama', 'list']);
+    const result = await runOllama(docker, config, ['list']);
     if (result.exitCode !== 0) {
       showError('Failed to list models.', 'Make sure the stack is running with "pondok-ai up".');
       process.exit(1);
@@ -203,7 +221,7 @@ async function installModel(model: string, options: ModelOptions): Promise<void>
     logger.warn(`${fit.warning}\n`);
   }
 
-  getDockerClient(options);
+  const { config } = getDockerClient(options);
 
   const spinner = ora(`Pulling model: ${model}...`).start();
 
@@ -213,10 +231,12 @@ async function installModel(model: string, options: ModelOptions): Promise<void>
     logger.info(`Pulling ${chalk.bold(model)}...\n`);
 
     const { execStream: streamExec } = await import('../utils/exec.js');
-    const exitCode = await streamExec('docker', [
-      'compose', '-f', new ConfigManager(options.dir ?? process.cwd()).getComposePath(),
-      'exec', '-T', 'ollama', 'ollama', 'pull', model,
-    ]);
+    const exitCode = config && isNativeOllama(config)
+      ? await streamExec('ollama', ['pull', model])
+      : await streamExec('docker', [
+        'compose', '-f', new ConfigManager(options.dir ?? process.cwd()).getComposePath(),
+        'exec', '-T', 'ollama', 'ollama', 'pull', model,
+      ]);
 
     if (exitCode !== 0) {
       showError(`Failed to pull model: ${model}`);
@@ -239,10 +259,10 @@ async function removeModel(model: string, options: ModelOptions): Promise<void> 
     process.exit(1);
   }
 
-  const { docker } = getDockerClient(options);
+  const { docker, config } = getDockerClient(options);
 
   try {
-    const result = await docker.execInContainer('ollama', ['ollama', 'rm', model]);
+    const result = await runOllama(docker, config, ['rm', model]);
     if (result.exitCode !== 0) {
       showError(`Failed to remove model: ${model}`, result.stdout || 'Model may not exist.');
       process.exit(1);
@@ -259,10 +279,10 @@ async function removeModel(model: string, options: ModelOptions): Promise<void> 
 }
 
 async function modelStatus(options: ModelOptions): Promise<void> {
-  const { docker } = getDockerClient(options);
+  const { docker, config } = getDockerClient(options);
 
   try {
-    const result = await docker.execInContainer('ollama', ['ollama', 'ps']);
+    const result = await runOllama(docker, config, ['ps']);
     if (result.exitCode !== 0) {
       showError('Failed to get model status.');
       process.exit(1);

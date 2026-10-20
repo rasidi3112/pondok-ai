@@ -81,6 +81,18 @@ describe('CLI Init Integration', () => {
     expect(envContent).toContain('API_SECRET_KEY=');
   });
 
+  it.skipIf(process.platform === 'darwin')('should keep Docker Ollama when --native-ollama is used off macOS', () => {
+    const output = runCli('init --preset minimal --yes --force --native-ollama', testDir);
+
+    expect(output).toContain('Stack initialized successfully!');
+
+    const config = JSON.parse(readFileSync(join(testDir, '.pondok-ai', 'config.json'), 'utf-8'));
+    expect(config.services.ollama.runtime).toBe('docker');
+
+    const compose = readFileSync(join(testDir, '.pondok-ai', 'docker-compose.yml'), 'utf-8');
+    expect(compose).toContain('ollama/ollama');
+  });
+
   it('should reject invalid preset', () => {
     const output = runCli('init --preset invalid-preset --yes', testDir);
     expect(output).toContain('Invalid preset');

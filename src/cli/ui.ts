@@ -90,7 +90,9 @@ export function showServiceUrls(config: StackConfig): void {
   if (services.api.enabled) {
     urlEntries.push({ name: 'API Gateway', url: `http://${bind}:${services.api.port}` });
   }
-  if (services.ollama.enabled) {
+  if (services.ollama.enabled && services.ollama.runtime === 'native') {
+    urlEntries.push({ name: 'Ollama (native)', url: `http://localhost:${services.ollama.port}` });
+  } else if (services.ollama.enabled) {
     urlEntries.push({ name: 'Ollama', url: `http://${bind}:${services.ollama.port}` });
   }
   if (services.qdrant.enabled) {
@@ -128,7 +130,8 @@ export function showConfig(config: StackConfig): void {
     const statusIcon = svc.enabled ? chalk.green('✓') : chalk.gray('○');
     const name = meta?.displayName ?? key;
     const port = svc.port ?? meta?.defaultPort ?? '—';
-    console.log(`    ${statusIcon} ${name.padEnd(14)} ${chalk.gray(`port: ${port}`)}`);
+    const note = key === 'ollama' && config.services.ollama.runtime === 'native' ? ' (native on host)' : '';
+    console.log(`    ${statusIcon} ${name.padEnd(14)} ${chalk.gray(`port: ${port}${note}`)}`);
   }
 
   console.log();

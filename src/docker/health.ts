@@ -59,7 +59,10 @@ export async function waitForServicesHealthy(
     if (!svc.enabled) continue;
 
     const meta = SERVICE_REGISTRY[key];
-    const bindHost = config.network.bindAddress === '0.0.0.0' ? '127.0.0.1' : config.network.bindAddress;
+    // A native Ollama listens on the host's own loopback, not the stack's bind address
+    const nativeOllama = key === 'ollama' && config.services.ollama.runtime === 'native';
+    const bindHost =
+      nativeOllama || config.network.bindAddress === '0.0.0.0' ? '127.0.0.1' : config.network.bindAddress;
 
     let probeUrl: string | undefined;
     if (meta?.healthEndpoint && !meta.isInternal) {

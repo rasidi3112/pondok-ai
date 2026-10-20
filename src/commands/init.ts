@@ -6,6 +6,7 @@ import { PRESET_DESCRIPTIONS } from '../config/defaults.js';
 import { detectSystem } from '../system/detect.js';
 import { checkRequirements, hasErrors } from '../system/requirements.js';
 import { copyGatewayBuildContext } from '../system/resources.js';
+import { detectNativeOllama, supportsNativeOllama } from '../system/ollama-native.js';
 import { generateComposeFile } from '../docker/compose.js';
 import { showBanner, showRequirements, showConfig, showError, showSuccess } from '../cli/ui.js';
 import { logger } from '../utils/logger.js';
@@ -15,6 +16,7 @@ interface InitOptions {
   nonInteractive?: boolean;
   yes?: boolean;
   gpu?: boolean;
+  nativeOllama?: boolean;
   force?: boolean;
   skipChecks?: boolean;
   dir?: string;
@@ -29,6 +31,7 @@ export function createInitCommand(): Command {
     .option('-f, --force', 'Proceed even if system requirements are not met')
     .option('--skip-checks', 'Skip system requirements checks')
     .option('--gpu', 'Enable GPU support for Ollama')
+    .option('--native-ollama', 'macOS: use a natively installed Ollama (Metal GPU) instead of the Docker container')
     .option('-d, --dir <directory>', 'Working directory', process.cwd())
     .action(async (options: InitOptions) => {
       await runInit(options);
@@ -115,8 +118,44 @@ async function runInit(options: InitOptions): Promise<void> {
   // Generate configuration
   const config = configManager.generateConfig(preset);
 
-  // GPU detection
-  if (options.gpu) {
+  // Native Ollama (macOS only): Docker on macOS cannot reach the Metal GPU
+  let useNativeOllama = false;
+  if (config.services.ollama.enabled && supportsNativeOllama(system.platform)) {
+    if (options.nativeOllama) {
+      useNativeOllama = true;
+    } else if (system.gpuType === 'metal' && !isNonInteractive) {
+      const { default: inquirer } = await import('inquirer');
+      const nativeAnswer = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'useNative',
+          message: `GPU detected (${system.gpuInfo}). Docker cannot use the Metal GPU. Use a natively installed Ollama instead?`,
+          default: true,
+        },
+      ]);
+      useNativeOllama = nativeAnswer.useNative;
+    }
+  } else if (options.nativeOllama) {
+    logger.warn('--native-ollama is only supported on macOS. Ollama will run in Docker.\n');
+  }
+
+  if (useNativeOllama) {
+    config.services.ollama.runtime = 'native';
+    config.services.ollama.gpuEnabled = false;
+
+    const native = await detectNativeOllama();
+    if (native.installed) {
+      logger.success(`Native Ollama found${native.version ? ` (v${native.version})` : ''}`);
+    } else {
+      logger.warn('Ollama is not installed on this Mac. Install it before running "pondok-ai up":');
+      logger.raw('    brew install ollama   (or download from https://ollama.com/download)\n');
+    }
+  } else if (supportsNativeOllama(system.platform)) {
+    // NVIDIA passthrough does not exist on macOS, so the Linux GPU prompt does not apply here
+    if (options.gpu) {
+      logger.warn('--gpu has no effect for Docker on macOS. Use --native-ollama for Metal GPU acceleration.\n');
+    }
+  } else if (options.gpu) {
     config.services.ollama.gpuEnabled = true;
   } else if (system.gpuAvailable && !isNonInteractive) {
     const { default: inquirer } = await import('inquirer');

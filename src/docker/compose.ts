@@ -1,6 +1,7 @@
 import { dump as yamlDump } from 'js-yaml';
 import { DEFAULT_IMAGES, LEGACY_DEFAULT_API_IMAGE } from '../config/defaults.js';
 import { GeneratedEnv, StackConfig } from '../config/schema.js';
+import { DOCKER_HOST_GATEWAY, getOllamaUrlForContainers, isNativeOllama } from '../system/ollama-native.js';
 
 interface ComposeBuild {
   context: string;
@@ -15,6 +16,7 @@ interface ComposeService {
   ports?: string[];
   volumes?: string[];
   environment?: Record<string, string>;
+  extra_hosts?: string[];
   depends_on?: Record<string, { condition: string }> | string[];
   networks?: string[];
   healthcheck?: {
@@ -58,9 +60,13 @@ export function generateComposeFile(config: StackConfig, _env?: GeneratedEnv): s
   };
 
   const bind = config.network.bindAddress;
+  const nativeOllama = isNativeOllama(config);
+  const ollamaUrl = getOllamaUrlForContainers(config);
+  // Lets containers resolve the host when Ollama runs natively on it
+  const hostGateway = [`${DOCKER_HOST_GATEWAY}:host-gateway`];
 
-  // Ollama
-  if (config.services.ollama.enabled) {
+  // Ollama (skipped when a natively installed Ollama is used instead)
+  if (config.services.ollama.enabled && !nativeOllama) {
     const ollamaService: ComposeService = {
       image: config.services.ollama.image ?? DEFAULT_IMAGES.ollama,
       container_name: `${config.projectName}-ollama`,
@@ -107,13 +113,18 @@ export function generateComposeFile(config: StackConfig, _env?: GeneratedEnv): s
       ports: [`${bind}:${config.services.openwebui.port}:8080`],
       volumes: ['openwebui-data:/app/backend/data'],
       environment: {
-        OLLAMA_BASE_URL: 'http://ollama:11434',
+        OLLAMA_BASE_URL: ollamaUrl,
       },
       networks: ['pondok-ai-network'],
       depends_on: {
         ollama: { condition: 'service_healthy' },
       },
     };
+
+    if (nativeOllama) {
+      delete openwebuiService.depends_on;
+      openwebuiService.extra_hosts = hostGateway;
+    }
 
     compose.services.openwebui = openwebuiService;
     compose.volumes['openwebui-data'] = { driver: 'local' };
@@ -168,7 +179,7 @@ export function generateComposeFile(config: StackConfig, _env?: GeneratedEnv): s
   // API Gateway
   if (config.services.api.enabled) {
     const apiDependsOn: Record<string, { condition: string }> = {};
-    if (config.services.ollama.enabled) {
+    if (config.services.ollama.enabled && !nativeOllama) {
       apiDependsOn.ollama = { condition: 'service_healthy' };
     }
     if (config.services.postgres.enabled) {
@@ -184,7 +195,7 @@ export function generateComposeFile(config: StackConfig, _env?: GeneratedEnv): s
       restart: 'unless-stopped',
       ports: [`${bind}:${config.services.api.port}:8000`],
       environment: {
-        OLLAMA_BASE_URL: 'http://ollama:11434',
+        OLLAMA_BASE_URL: ollamaUrl,
         QDRANT_URL: config.services.qdrant.enabled ? 'http://qdrant:6333' : '',
         DATABASE_URL: config.services.postgres.enabled
           ? 'postgresql://${POSTGRES_USER:-localaistack}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-localaistack}'
@@ -213,6 +224,10 @@ export function generateComposeFile(config: StackConfig, _env?: GeneratedEnv): s
     if (config.services.api.image && config.services.api.image !== LEGACY_DEFAULT_API_IMAGE) {
       delete apiService.build;
       apiService.image = config.services.api.image;
+    }
+
+    if (nativeOllama) {
+      apiService.extra_hosts = hostGateway;
     }
 
     compose.services.api = apiService;

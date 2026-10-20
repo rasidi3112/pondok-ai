@@ -103,7 +103,7 @@ export async function runBackup(options: BackupOptions): Promise<string> {
     if (config.services.qdrant.enabled) volumesToBackup.push('qdrant-data');
     if (config.services.openwebui.enabled) volumesToBackup.push('openwebui-data');
     if (config.services.n8n.enabled) volumesToBackup.push('n8n-data');
-    if (options.includeModels && config.services.ollama.enabled) {
+    if (options.includeModels && config.services.ollama.enabled && config.services.ollama.runtime !== 'native') {
       volumesToBackup.push('ollama-data');
     }
 

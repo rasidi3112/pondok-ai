@@ -4,6 +4,12 @@
 
 export type Preset = 'minimal' | 'standard' | 'full';
 
+/**
+ * Where Ollama runs: inside the Docker stack, or natively on the host
+ * (macOS only, so it can use the Metal GPU).
+ */
+export type OllamaRuntime = 'docker' | 'native';
+
 export interface ServiceConfig {
   enabled: boolean;
   port?: number;
@@ -18,6 +24,7 @@ export interface StackConfig {
   services: {
     ollama: ServiceConfig & {
       gpuEnabled: boolean;
+      runtime?: OllamaRuntime;
     };
     openwebui: ServiceConfig;
     postgres: ServiceConfig & {

@@ -88,6 +88,7 @@ export function getDefaultConfig(preset: Preset): StackConfig {
         port: DEFAULT_PORTS.ollama,
         image: DEFAULT_IMAGES.ollama,
         gpuEnabled: false,
+        runtime: 'docker',
       },
       openwebui: {
         enabled: enabledServices.includes('openwebui'),

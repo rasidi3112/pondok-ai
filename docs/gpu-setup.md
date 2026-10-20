@@ -16,8 +16,15 @@ Docker Desktop on macOS runs containers inside a lightweight Linux hypervisor. C
 1. **CPU Emulation in Docker**:
    - For models under 7B (such as `llama3.2:3b` or `phi3:mini`), modern Apple Silicon CPUs generate 15–25 tokens/second even without GPU passthrough in Docker.
 2. **Native Host Ollama (Maximum Performance)**:
-   - Run Ollama natively on macOS: `brew install ollama && ollama serve`
-   - In `pondok-ai.json`, disable the Docker Ollama container (`"services": { "ollama": { "enabled": false } }`) and point Open WebUI & API Gateway to `http://host.docker.internal:11434`.
+   - Install Ollama natively: `brew install ollama` (or download from https://ollama.com/download).
+   - Initialize the stack with the native runtime:
+     ```bash
+     pondok-ai init --native-ollama
+     ```
+     When an Apple Silicon GPU is detected, interactive `pondok-ai init` also asks whether to use native Ollama.
+   - Start Ollama (`ollama serve`, or open the Ollama app), then run `pondok-ai up`.
+
+   With the native runtime, `pondok-ai` skips the Ollama container, points Open WebUI and the API Gateway at `http://host.docker.internal:11434`, and runs `pondok-ai model` commands against your local `ollama` binary. This is stored as `"runtime": "native"` under `services.ollama` in the config. The option only applies on macOS; on Linux and Windows Ollama always runs in Docker.
 
 ---
 
