@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Community Discussions
+  - name: Questions and ideas
     url: https://github.com/rasidi3112/pondok-ai/discussions
-    about: Please ask questions and share ideas here!
+    about: Ask questions and share what you built with pondok-ai.
+  - name: Report a security vulnerability
+    url: https://github.com/rasidi3112/pondok-ai/security/advisories/new
+    about: Please report security issues privately, not as a public issue.
