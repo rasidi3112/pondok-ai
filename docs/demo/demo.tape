@@ -9,7 +9,7 @@ Require npx
 Require docker
 
 Set Shell "bash"
-Set FontSize 20
+Set FontSize 16
 Set Width 1280
 Set Height 720
 Set Padding 24
@@ -27,11 +27,9 @@ Sleep 500ms
 Type "npx pondok-ai init --preset minimal --yes"
 Sleep 400ms
 Enter
-Wait+Screen@60s /initialized successfully/
-Sleep 2s
+Sleep 8s
 
 Type "clear && npx pondok-ai up"
 Sleep 400ms
 Enter
-Wait+Screen@120s /All services started/
-Sleep 3s
+Sleep 40s

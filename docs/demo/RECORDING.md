@@ -44,9 +44,8 @@ Finally stop the warm-up stack so `up` in the recording really starts it (volume
 npx pondok-ai down
 ```
 
-Note that `demo.tape` runs `init` in a fresh `/tmp/pondok-demo` folder, which gets its own Compose project.
-If Open WebUI in that folder asks you to sign up again, do the account and model setup there once,
-run `npx pondok-ai down`, and re-render the tape.
+Every folder uses the same Compose project (`pondok-ai`), so the account and model you set up here
+are still there when `demo.tape` runs `init` and `up` in a fresh `/tmp/pondok-demo` folder.
 
 ## 2. Record the terminal clip
 
@@ -57,30 +56,35 @@ vhs docs/demo/demo.tape
 ```
 
 This writes `docs/demo/terminal.mp4`. The tape waits on the real CLI output, so the clip length follows your machine.
-If `up` takes more than about 8 seconds, trim the dead time afterwards, for example:
-
-```bash
-ffmpeg -i docs/demo/terminal.mp4 -ss 0 -t 16 -c copy docs/demo/terminal-trimmed.mp4
-```
+The tape sleeps long enough for `up` to finish on a slow machine, so trim the idle time afterwards
+(the committed GIF cuts the pauses and plays the health-check wait at 6x, labelled on screen).
 
 ## 3. Record the browser clip
 
-1. Use a clean browser window at 1280×720 (or any 16:9 size), no bookmarks bar or extensions in view.
-2. Use dark mode in Open WebUI so it matches the terminal theme.
-3. Start recording, open http://localhost:3000, start a new chat, paste the prompt, press Enter.
-4. Stop recording about one second after the reply finishes. Aim for 10–14 seconds.
-5. Save it as `docs/demo/browser.mp4` (convert `.mov` with `ffmpeg -i in.mov docs/demo/browser.mp4`).
+With the stack from step 2 still running, record the chat with Playwright (it signs in, dismisses the
+"What's New" dialog off camera, types the prompt, and waits for the reply to finish):
+
+```bash
+npm i --no-save playwright
+WEBUI_EMAIL=you@example.com WEBUI_PASSWORD=... node docs/demo/record-browser.mjs
+```
+
+This writes `docs/demo/browser.webm`. Set `DEMO_MODEL` or `DEMO_PROMPT` to change the model or question,
+and `CHROMIUM_PATH` to use a browser you already have.
+
+To record by hand instead, use a 1280×720 dark-mode browser window, open http://localhost:3000,
+send the prompt, stop about one second after the reply finishes, and save it as `docs/demo/browser.mp4`.
 
 ## 4. Build the GIF
 
 ```bash
-docs/demo/make-gif.sh docs/demo/terminal.mp4 docs/demo/browser.mp4
+docs/demo/make-gif.sh docs/demo/terminal.mp4 docs/demo/browser.webm
 ```
 
 This writes `docs/demo/demo.gif` at 960px wide and 12 fps. Keep it under about 8 MB so GitHub shows it inline.
 If it is too large, try `WIDTH=800 FPS=10 docs/demo/make-gif.sh ...`.
 
-Commit only `docs/demo/demo.gif`. The `.mp4` sources are ignored by git.
+Commit only `docs/demo/demo.gif`. The `.mp4` and `.webm` sources are ignored by git.
 
 ## Checklist before committing
 

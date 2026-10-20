@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Stitch the terminal clip and the Open WebUI clip into docs/demo/demo.gif.
-# Usage: docs/demo/make-gif.sh docs/demo/terminal.mp4 docs/demo/browser.mp4
+# Usage: docs/demo/make-gif.sh docs/demo/terminal.mp4 docs/demo/browser.webm
 set -euo pipefail
 
 TERMINAL="${1:-docs/demo/terminal.mp4}"
-BROWSER="${2:-docs/demo/browser.mp4}"
+BROWSER="${2:-docs/demo/browser.webm}"
 OUT="${3:-docs/demo/demo.gif}"
 WIDTH="${WIDTH:-960}"
 FPS="${FPS:-12}"
