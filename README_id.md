@@ -27,7 +27,7 @@ LLM lokal, antarmuka chat, pencarian vektor, dan API yang kompatibel dengan Open
 
 <br>
 
-[Mulai Cepat](#mulai-cepat) · [Fitur](#fitur) · [Tangkapan Layar](#tangkapan-layar) · [Preset](#preset) · [CLI](#perintah-cli) · [API Gateway](#api-gateway) · [Dokumentasi](#dokumentasi)
+[Mulai Cepat](#mulai-cepat) · [Fitur](#fitur) · [Tangkapan Layar](#tangkapan-layar) · [Preset](#preset) · [Berbagi lewat jaringan](#berbagi-lewat-jaringan) · [CLI](#perintah-cli) · [API Gateway](#api-gateway) · [Dokumentasi](#dokumentasi)
 
 </div>
 
@@ -53,6 +53,7 @@ npx pondok-ai up
 | **Pemrosesan lokal** | Prompt, percakapan, embedding, dan inferensi berjalan di perangkat keras Anda. |
 | **Deteksi perangkat keras** | Mendeteksi OS, arsitektur, RAM, disk, dan GPU (Apple Metal, NVIDIA CUDA), lalu merekomendasikan preset dan model yang cocok. |
 | **Preset modular** | Pilih mulai dari antarmuka chat ringan (`minimal`), stack RAG (`standard`), hingga pipeline otomatisasi (`full`). |
+| **Berbagi lewat jaringan** | `pondok-ai share` menjadikan satu komputer ChatGPT pribadi untuk satu kelas atau kantor: semua orang di WiFi yang sama membuka Open WebUI lewat QR code dan masuk dengan akun masing-masing. |
 | **Gateway kompatibel OpenAI** | Arahkan OpenAI SDK atau LangChain ke `http://localhost:8000/v1` tanpa menulis ulang kode. |
 | **Manajer model** | Unduh, tampilkan, periksa, dan hapus model, dengan pemeriksaan keamanan RAM dan disk sebelum setiap unduhan. |
 | **Diagnostik** | `pondok-ai doctor` memeriksa Docker daemon, port, RAM, disk, dan GPU sebelum Anda menemui masalah. |
@@ -141,6 +142,28 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 | **`standard`** *(default)* | Ollama, Open WebUI, PostgreSQL, Qdrant, API Gateway | 16 GB | Pipeline RAG, pengembangan aplikasi, pengganti OpenAI |
 | **`full`** | Standard + mesin otomatisasi n8n | 16+ GB | Agen AI otonom, otomatisasi alur kerja visual |
 
+## Berbagi lewat jaringan
+
+Satu komputer bisa melayani satu kelas, kantor, atau pesantren. Semua orang yang tersambung ke WiFi atau LAN yang sama membuka Open WebUI di browser, masing-masing dengan akun dan riwayat chat sendiri, sementara modelnya berjalan di satu komputer itu.
+
+```bash
+# 1. Nyalakan stack dan buat akun admin di http://localhost:3000
+npx pondok-ai up
+
+# 2. Bagikan Open WebUI ke jaringan lokal dan tampilkan QR code
+npx pondok-ai share
+```
+
+`share` menampilkan alamat untuk setiap jaringan yang tersambung, misalnya `http://192.168.1.20:3000`, beserta QR code yang bisa dipindai dengan ponsel.
+
+Aman secara default:
+
+- **Admin dulu.** `share` menolak berjalan sebelum akun admin Open WebUI dibuat, karena akun pertama yang mendaftar menjadi admin.
+- **Login selalu aktif.** Akun baru berstatus *pending* sampai admin menyetujuinya di **Admin Panel > Users**.
+- **Hanya Open WebUI yang dibagikan.** API gateway, Ollama, Qdrant, dan n8n tetap memakai bind address (`127.0.0.1` secara default), jadi tidak ada layanan tanpa login yang terbuka.
+
+Lalu lintasnya HTTP biasa, jadi bagikan hanya di jaringan yang dipercaya, bukan WiFi publik. Firewall sistem operasi mungkin meminta izin koneksi masuk saat pertama kali. Hentikan dengan `npx pondok-ai share --stop`.
+
 ## Arsitektur
 
 ```
@@ -184,6 +207,7 @@ Lihat [Ikhtisar Arsitektur](./docs/architecture.md) untuk detailnya.
 | `pondok-ai restore <path>` | Memulihkan dari cadangan yang diperiksa integritas SHA-256-nya (tidak dienkripsi) |
 | `pondok-ai reset` | Mengatur ulang stack (volume dipertahankan kecuali `--delete-data` digunakan) |
 | `pondok-ai config` | Memeriksa atau mengedit konfigurasi aktif |
+| `pondok-ai share` | Membagikan Open WebUI ke WiFi atau LAN dengan QR code (`--stop` untuk berhenti) |
 | `pondok-ai model list` | Menampilkan daftar model yang sudah diunduh |
 | `pondok-ai model recommend` | Rekomendasi model sesuai perangkat keras (RAM, VRAM, disk) |
 | `pondok-ai model install <name>` | Mengunduh model baru dengan pemeriksaan awal ketersediaan sumber daya |

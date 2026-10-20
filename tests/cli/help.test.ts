@@ -41,6 +41,14 @@ describe('CLI Help', () => {
     expect(output).toContain('model');
     expect(output).toContain('backup');
     expect(output).toContain('restore');
+    expect(output).toContain('share');
+  });
+
+  it('should display help for share command', () => {
+    const output = runCli('share --help');
+    expect(output).toContain('local network');
+    expect(output).toContain('--stop');
+    expect(output).toContain('--yes');
   });
 
   it('should display help for init command', () => {

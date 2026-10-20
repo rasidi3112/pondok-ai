@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Share on your network.** `pondok-ai share` publishes Open WebUI on the local network and prints its addresses with a QR code, so a classroom or office can use one machine from their own devices. It refuses to run until the Open WebUI admin account exists, keeps login on (`WEBUI_AUTH=True`), and leaves every other service on the bind address. `pondok-ai share --stop` turns it off.
+
 ## [0.4.0] - 2026-10-20
 
 ### Added

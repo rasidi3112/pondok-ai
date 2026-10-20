@@ -27,7 +27,7 @@ Local LLMs, a chat UI, vector search, and an OpenAI-compatible API, wired togeth
 
 <br>
 
-[Quickstart](#quickstart) · [Features](#features) · [Screenshots](#screenshots) · [Presets](#presets) · [CLI](#cli-commands) · [API Gateway](#api-gateway) · [Docs](#documentation)
+[Quickstart](#quickstart) · [Features](#features) · [Screenshots](#screenshots) · [Presets](#presets) · [Share on your network](#share-on-your-network) · [CLI](#cli-commands) · [API Gateway](#api-gateway) · [Docs](#documentation)
 
 </div>
 
@@ -53,6 +53,7 @@ npx pondok-ai up
 | **Local processing** | Prompts, chats, embeddings, and inference run on your hardware. |
 | **Hardware detection** | Detects OS, architecture, RAM, disk, and GPU (Apple Metal, NVIDIA CUDA) and recommends a preset and models that fit. |
 | **Modular presets** | Scale from a lightweight chat UI (`minimal`) to a RAG stack (`standard`) or an automation pipeline (`full`). |
+| **Share on your network** | `pondok-ai share` turns one machine into a private ChatGPT for a classroom or office: everyone on the same Wi-Fi opens Open WebUI from a QR code and logs in with their own account. |
 | **OpenAI-compatible gateway** | Point the OpenAI SDKs or LangChain at `http://localhost:8000/v1` without rewriting code. |
 | **Model manager** | Pull, list, inspect, and remove models with RAM and disk safety checks before each download. |
 | **Diagnostics** | `pondok-ai doctor` checks the Docker daemon, ports, RAM, disk, and GPU before you hit problems. |
@@ -141,6 +142,28 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 | **`standard`** *(default)* | Ollama, Open WebUI, PostgreSQL, Qdrant, API Gateway | 16 GB | RAG pipelines, app development, OpenAI replacement |
 | **`full`** | Standard + n8n automation engine | 16+ GB | Autonomous AI agents, visual workflow automation |
 
+## Share on your network
+
+One machine can serve a whole classroom, office, or pesantren. Everyone on the same Wi-Fi or LAN opens Open WebUI in their browser, each with their own account and chat history, while the models run on that one machine.
+
+```bash
+# 1. Start the stack and create the admin account at http://localhost:3000
+npx pondok-ai up
+
+# 2. Share Open WebUI on the local network and print a QR code
+npx pondok-ai share
+```
+
+`share` prints the address for each network this machine is on, such as `http://192.168.1.20:3000`, with a QR code people can scan with their phone.
+
+It is safe by default:
+
+- **Admin first.** `share` refuses to run until the Open WebUI admin account exists, because the first account to sign up becomes the admin.
+- **Login is always on.** New accounts wait as *pending* until the admin approves them in **Admin Panel > Users**.
+- **Only Open WebUI is shared.** The API gateway, Ollama, Qdrant, and n8n keep their bind address (`127.0.0.1` by default), so nothing without a login is exposed.
+
+Traffic is plain HTTP, so share only on a network you trust, not public Wi-Fi. Your OS firewall may ask to allow incoming connections the first time. Stop sharing with `npx pondok-ai share --stop`.
+
 ## Architecture
 
 ```
@@ -184,6 +207,7 @@ See the [Architecture Overview](./docs/architecture.md) for details.
 | `pondok-ai restore <path>` | Restore from a SHA-256 integrity-checked backup (not encrypted) |
 | `pondok-ai reset` | Reset stack (preserves volumes unless `--delete-data` is specified) |
 | `pondok-ai config` | Inspect or edit active configuration |
+| `pondok-ai share` | Share Open WebUI on your Wi-Fi or LAN with a QR code (`--stop` to end) |
 | `pondok-ai model list` | List downloaded models |
 | `pondok-ai model recommend` | Hardware-tailored model recommendations (RAM, VRAM, Disk) |
 | `pondok-ai model install <name>` | Pull a new model with pre-flight resource safety checks |
