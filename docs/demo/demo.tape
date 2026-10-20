@@ -1,0 +1,37 @@
+# Terminal half of the README demo (pondok-ai init, then up).
+# Render with VHS (https://github.com/charmbracelet/vhs):
+#   vhs docs/demo/demo.tape
+# See docs/demo/RECORDING.md for the full recording script.
+
+Output docs/demo/terminal.mp4
+
+Require npx
+Require docker
+
+Set Shell "bash"
+Set FontSize 20
+Set Width 1280
+Set Height 720
+Set Padding 24
+Set Theme "Catppuccin Mocha"
+Set TypingSpeed 45ms
+Set Framerate 30
+
+# Start from an empty folder so init runs on a clean slate.
+Hide
+Type "rm -rf /tmp/pondok-demo && mkdir -p /tmp/pondok-demo && cd /tmp/pondok-demo && clear"
+Enter
+Show
+
+Sleep 500ms
+Type "npx pondok-ai init --preset minimal --yes"
+Sleep 400ms
+Enter
+Wait+Screen@60s /initialized successfully/
+Sleep 2s
+
+Type "clear && npx pondok-ai up"
+Sleep 400ms
+Enter
+Wait+Screen@120s /All services started/
+Sleep 3s
