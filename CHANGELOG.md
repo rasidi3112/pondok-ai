@@ -14,11 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Opt-in native Ollama on macOS so models run on the Apple Silicon GPU (Metal). `pondok-ai init --native-ollama`, or answering yes when an Apple Silicon GPU is detected, skips the Ollama container and points Open WebUI and the API Gateway at the host Ollama via `host.docker.internal`. `model` commands, health checks and `up` use the host Ollama in this mode. Linux and Windows behavior is unchanged.
 - Demo GIF and 1080p demo video in the README, with the scripts used to record them in `docs/demo/`.
+- Polish README translation (thanks @MeydhiXploit).
 - GitHub issue forms, Dependabot, CodeQL scanning, and a workflow that publishes the API Gateway image to `ghcr.io/rasidi3112/pondok-ai-gateway` (amd64 and arm64) on each release tag.
 
 ### Changed
 - The NVIDIA GPU prompt no longer appears on macOS.
 - README restructured with screenshots, a feature table and a shorter quickstart.
+- All 16 translated READMEs synced with the English README, with the same language selector in every file.
 - Security reports now go through GitHub Private Vulnerability Reporting.
 
 ## [0.3.1] - 2026-10-13
