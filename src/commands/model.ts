@@ -13,6 +13,7 @@ import { isNativeOllama } from '../system/ollama-native.js';
 interface ModelOptions {
   dir?: string;
   force?: boolean;
+  lang?: string;
 }
 
 export function createModelCommand(): Command {
@@ -30,9 +31,10 @@ export function createModelCommand(): Command {
   cmd
     .command('recommend')
     .description('Recommend models based on detected system hardware (RAM, VRAM, disk)')
+    .option('-l, --lang <code>', 'Only recommend models that handle this language well (id = Bahasa Indonesia)')
     .option('-d, --dir <directory>', 'Working directory', process.cwd())
-    .action(async () => {
-      await recommendModels();
+    .action(async (options: ModelOptions) => {
+      await recommendModels(options);
     });
 
   cmd
@@ -124,15 +126,24 @@ async function listModels(options: ModelOptions): Promise<void> {
   }
 }
 
-async function recommendModels(): Promise<void> {
+async function recommendModels(options: ModelOptions = {}): Promise<void> {
   const { detectSystem } = await import('../system/detect.js');
-  const { getModelRecommendations } = await import('../system/recommendations.js');
+  const { getModelRecommendations, SUPPORTED_LANGUAGES } = await import('../system/recommendations.js');
+
+  const language = options.lang?.trim().toLowerCase();
+  if (language && !SUPPORTED_LANGUAGES[language]) {
+    showError(
+      `Unsupported language: ${options.lang}`,
+      `Supported: ${Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => `${code} (${name})`).join(', ')}`,
+    );
+    process.exit(1);
+  }
 
   const spinner = ora('Detecting system hardware for model recommendations...').start();
   const system = await detectSystem();
   spinner.stop();
 
-  const report = getModelRecommendations(system);
+  const report = getModelRecommendations(system, { language });
 
   console.log(chalk.bold('\nHardware Profile:'));
   console.log(`  RAM:         ${system.totalMemoryGB} GB (${system.freeMemoryGB} GB free)`);
@@ -144,6 +155,11 @@ async function recommendModels(): Promise<void> {
     console.log(`  VRAM:        ${system.vramGB} GB`);
   }
   console.log();
+
+  if (language) {
+    console.log(chalk.bold(`Showing models that handle ${SUPPORTED_LANGUAGES[language]} well.`));
+    console.log();
+  }
 
   console.log(chalk.bold('Recommended Default Model:'));
   console.log(`  ${chalk.green.bold(report.recommendedDefault.name)} (${report.recommendedDefault.displayName})`);

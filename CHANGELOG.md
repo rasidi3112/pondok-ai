@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Share on your network.** `pondok-ai share` publishes Open WebUI on the local network and prints its addresses with a QR code, so a classroom or office can use one machine from their own devices. It refuses to run until the Open WebUI admin account exists, keeps login on (`WEBUI_AUTH=True`), and leaves every other service on the bind address. `pondok-ai share --stop` turns it off.
+- **Models for Bahasa Indonesia.** `pondok-ai model recommend --lang id` lists only models that answer well in Indonesian and picks one for your RAM: Qwen 2.5 (1.5B, 3B, 7B), Gemma 3 (4B, 12B), Aya Expanse (8B), and BGE-M3 embeddings for RAG over Indonesian documents. These models are also added to the default list.
+
+### Fixed
+- `model install` no longer sizes a larger tag like a smaller model of the same family. `qwen2.5:14b` or `deepseek-r1:32b` used to match `qwen2.5:1.5b` or `deepseek-r1:7b` and pass the memory check; tags that are not in the list are now estimated from their parameter count and quantization.
 
 ## [0.4.0] - 2026-10-20
 

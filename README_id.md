@@ -85,6 +85,9 @@ npx pondok-ai up
 # Rekomendasi berdasarkan RAM, VRAM, dan ruang disk kosong Anda
 npx pondok-ai model recommend
 
+# Hanya model yang menjawab dengan baik dalam Bahasa Indonesia (Gemma 3, Qwen 2.5, Aya Expanse, BGE-M3)
+npx pondok-ai model recommend --lang id
+
 # Instal dengan pemeriksaan awal memori dan disk
 npx pondok-ai model install llama3.2:3b
 ```
@@ -209,7 +212,7 @@ Lihat [Ikhtisar Arsitektur](./docs/architecture.md) untuk detailnya.
 | `pondok-ai config` | Memeriksa atau mengedit konfigurasi aktif |
 | `pondok-ai share` | Membagikan Open WebUI ke WiFi atau LAN dengan QR code (`--stop` untuk berhenti) |
 | `pondok-ai model list` | Menampilkan daftar model yang sudah diunduh |
-| `pondok-ai model recommend` | Rekomendasi model sesuai perangkat keras (RAM, VRAM, disk) |
+| `pondok-ai model recommend` | Rekomendasi model sesuai perangkat keras (RAM, VRAM, disk); `--lang id` untuk Bahasa Indonesia |
 | `pondok-ai model install <name>` | Mengunduh model baru dengan pemeriksaan awal ketersediaan sumber daya |
 | `pondok-ai model remove <name>` | Menghapus model yang terpasang |
 | `pondok-ai model status` | Memeriksa kebutuhan sumber daya model |

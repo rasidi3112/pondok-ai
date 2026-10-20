@@ -68,6 +68,17 @@ describe('CLI Help', () => {
     expect(output).toContain('recommend');
   });
 
+  it('should display the language option for model recommend', () => {
+    const output = runCli('model recommend --help');
+    expect(output).toContain('--lang');
+  });
+
+  it('should reject an unsupported recommendation language', () => {
+    const output = runCli('model recommend --lang xx');
+    expect(output).toContain('Unsupported language: xx');
+    expect(output).toContain('id (Bahasa Indonesia)');
+  });
+
   it('should display help for backup and restore commands', () => {
     const backupHelp = runCli('backup --help');
     expect(backupHelp).toContain('--output');
