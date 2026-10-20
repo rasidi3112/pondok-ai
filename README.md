@@ -11,6 +11,14 @@ Translations are machine-generated and may lag behind the English README.
 </p>
 
 <p align="center">
+  <img src="docs/demo/demo.gif" alt="pondok-ai demo: init, up, then chatting with a local model in Open WebUI" width="800">
+</p>
+
+<p align="center">
+  <em>From an empty folder to chatting with a local model in about 30 seconds (images and model pre-pulled).</em>
+</p>
+
+<p align="center">
   <a href="#quickstart">Quickstart</a> •
   <a href="#features">Features</a> •
   <a href="#presets">Presets</a> •

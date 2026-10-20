@@ -37,3 +37,7 @@ npm-debug.log*
 backup-*/
 .cache/
 .npm-custom-cache/
+
+# Demo recording sources (only demo.gif is committed)
+docs/demo/*.mp4
+docs/demo/*.mov
