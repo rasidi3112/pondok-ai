@@ -78,6 +78,7 @@ When you run `pondok-ai init` (or non-interactively via `pondok-ai init --preset
 ```
 
 - **`bindAddress`**: Default is `127.0.0.1` (strict localhost security). Change to `0.0.0.0` only if you intend to expose services to a local LAN.
+- **`lanShare`**: Set by `pondok-ai share` (default `false`). When `true`, only Open WebUI is published on all interfaces, with login forced on and model access open to approved users (`BYPASS_MODEL_ACCESS_CONTROL`); every other service keeps `bindAddress`. Prefer this over `0.0.0.0`, which also exposes Ollama and Qdrant, which have no login.
 - **`gatewayPort`**: Port assigned to the API Gateway.
 
 ### GPU Options

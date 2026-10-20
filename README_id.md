@@ -27,7 +27,7 @@ LLM lokal, antarmuka chat, pencarian vektor, dan API yang kompatibel dengan Open
 
 <br>
 
-[Mulai Cepat](#mulai-cepat) · [Fitur](#fitur) · [Tangkapan Layar](#tangkapan-layar) · [Preset](#preset) · [CLI](#perintah-cli) · [API Gateway](#api-gateway) · [Dokumentasi](#dokumentasi)
+[Mulai Cepat](#mulai-cepat) · [Fitur](#fitur) · [Tangkapan Layar](#tangkapan-layar) · [Preset](#preset) · [Berbagi lewat jaringan](#berbagi-lewat-jaringan) · [CLI](#perintah-cli) · [API Gateway](#api-gateway) · [Dokumentasi](#dokumentasi)
 
 </div>
 
@@ -53,6 +53,7 @@ npx pondok-ai up
 | **Pemrosesan lokal** | Prompt, percakapan, embedding, dan inferensi berjalan di perangkat keras Anda. |
 | **Deteksi perangkat keras** | Mendeteksi OS, arsitektur, RAM, disk, dan GPU (Apple Metal, NVIDIA CUDA), lalu merekomendasikan preset dan model yang cocok. |
 | **Preset modular** | Pilih mulai dari antarmuka chat ringan (`minimal`), stack RAG (`standard`), hingga pipeline otomatisasi (`full`). |
+| **Berbagi lewat jaringan** | `pondok-ai share` menjadikan satu komputer ChatGPT pribadi untuk satu kelas atau kantor: semua orang di WiFi yang sama membuka Open WebUI lewat QR code dan masuk dengan akun masing-masing. |
 | **Gateway kompatibel OpenAI** | Arahkan OpenAI SDK atau LangChain ke `http://localhost:8000/v1` tanpa menulis ulang kode. |
 | **Manajer model** | Unduh, tampilkan, periksa, dan hapus model, dengan pemeriksaan keamanan RAM dan disk sebelum setiap unduhan. |
 | **Diagnostik** | `pondok-ai doctor` memeriksa Docker daemon, port, RAM, disk, dan GPU sebelum Anda menemui masalah. |
@@ -83,6 +84,9 @@ npx pondok-ai up
 ```bash
 # Rekomendasi berdasarkan RAM, VRAM, dan ruang disk kosong Anda
 npx pondok-ai model recommend
+
+# Hanya model yang menjawab dengan baik dalam Bahasa Indonesia (Gemma 3, Qwen 2.5, Aya Expanse, BGE-M3)
+npx pondok-ai model recommend --lang id
 
 # Instal dengan pemeriksaan awal memori dan disk
 npx pondok-ai model install llama3.2:3b
@@ -141,6 +145,36 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 | **`standard`** *(default)* | Ollama, Open WebUI, PostgreSQL, Qdrant, API Gateway | 16 GB | Pipeline RAG, pengembangan aplikasi, pengganti OpenAI |
 | **`full`** | Standard + mesin otomatisasi n8n | 16+ GB | Agen AI otonom, otomatisasi alur kerja visual |
 
+## Berbagi lewat jaringan
+
+Satu komputer bisa melayani satu kelas, kantor, atau pesantren. Semua orang yang tersambung ke WiFi atau LAN yang sama membuka Open WebUI di browser, masing-masing dengan akun dan riwayat chat sendiri, sementara modelnya berjalan di satu komputer itu.
+
+1. Nyalakan stack, lalu buka http://localhost:3000 di komputer ini dan buat akun admin.
+
+   ```bash
+   npx pondok-ai up
+   ```
+
+2. Sebagai admin, buka **Admin Panel > Settings > General**, aktifkan **New Sign Ups**, lalu simpan. Open WebUI mematikan pendaftaran begitu akun admin dibuat. Biarkan **Default User Role** tetap **Pending**.
+3. Bagikan Open WebUI ke jaringan lokal:
+
+   ```bash
+   npx pondok-ai share
+   ```
+
+   Perintah ini menampilkan alamat untuk setiap jaringan yang tersambung, misalnya `http://192.168.1.20:3000`, beserta QR code yang bisa dipindai dengan ponsel. Di terminal berlatar terang, pakai `npx pondok-ai share --light` agar QR code bisa dipindai.
+4. Orang-orang mendaftar dari perangkat masing-masing. Setujui satu per satu di **Admin Panel > Users**, lalu mereka bisa langsung chat dengan model yang terpasang di komputer ini.
+
+Aman secara default:
+
+- **Admin dulu.** `share` menolak berjalan sebelum akun admin Open WebUI dibuat, karena akun pertama yang mendaftar menjadi admin.
+- **Login selalu aktif.** Akun baru berstatus *pending* sampai admin menyetujuinya di **Admin Panel > Users**.
+- **Hanya Open WebUI yang dibagikan.** API gateway, Ollama, Qdrant, dan n8n tetap memakai bind address (`127.0.0.1` secara default), jadi tidak ada layanan tanpa login yang terbuka.
+
+Selama berbagi, pengguna yang sudah disetujui bisa memakai semua model yang terpasang di komputer ini, termasuk yang Anda tandai privat di Workspace. Layar "Account Activation Pending" menampilkan nama dan email admin; matikan **Show Admin Details in Account Pending Overlay** di **Admin Panel > Settings > General** untuk menyembunyikannya.
+
+Lalu lintasnya HTTP biasa, jadi bagikan hanya di jaringan yang dipercaya, bukan WiFi publik. Firewall sistem operasi mungkin meminta izin koneksi masuk saat pertama kali. Hentikan dengan `npx pondok-ai share --stop`.
+
 ## Arsitektur
 
 ```
@@ -184,8 +218,9 @@ Lihat [Ikhtisar Arsitektur](./docs/architecture.md) untuk detailnya.
 | `pondok-ai restore <path>` | Memulihkan dari cadangan yang diperiksa integritas SHA-256-nya (tidak dienkripsi) |
 | `pondok-ai reset` | Mengatur ulang stack (volume dipertahankan kecuali `--delete-data` digunakan) |
 | `pondok-ai config` | Memeriksa atau mengedit konfigurasi aktif |
+| `pondok-ai share` | Membagikan Open WebUI ke WiFi atau LAN dengan QR code (`--stop` untuk berhenti) |
 | `pondok-ai model list` | Menampilkan daftar model yang sudah diunduh |
-| `pondok-ai model recommend` | Rekomendasi model sesuai perangkat keras (RAM, VRAM, disk) |
+| `pondok-ai model recommend` | Rekomendasi model sesuai perangkat keras (RAM, VRAM, disk); `--lang id` untuk Bahasa Indonesia |
 | `pondok-ai model install <name>` | Mengunduh model baru dengan pemeriksaan awal ketersediaan sumber daya |
 | `pondok-ai model remove <name>` | Menghapus model yang terpasang |
 | `pondok-ai model status` | Memeriksa kebutuhan sumber daya model |

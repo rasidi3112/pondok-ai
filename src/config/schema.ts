@@ -37,6 +37,11 @@ export interface StackConfig {
   };
   network: {
     bindAddress: string;
+    /**
+     * Publish Open WebUI on every network interface so other devices on the
+     * local network can reach it. Every other service keeps bindAddress.
+     */
+    lanShare?: boolean;
   };
 }
 

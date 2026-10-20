@@ -41,6 +41,15 @@ describe('CLI Help', () => {
     expect(output).toContain('model');
     expect(output).toContain('backup');
     expect(output).toContain('restore');
+    expect(output).toContain('share');
+  });
+
+  it('should display help for share command', () => {
+    const output = runCli('share --help');
+    expect(output).toContain('local network');
+    expect(output).toContain('--stop');
+    expect(output).toContain('--yes');
+    expect(output).toContain('--light');
   });
 
   it('should display help for init command', () => {
@@ -58,6 +67,17 @@ describe('CLI Help', () => {
     expect(output).toContain('remove');
     expect(output).toContain('status');
     expect(output).toContain('recommend');
+  });
+
+  it('should display the language option for model recommend', () => {
+    const output = runCli('model recommend --help');
+    expect(output).toContain('--lang');
+  });
+
+  it('should reject an unsupported recommendation language', () => {
+    const output = runCli('model recommend --lang xx');
+    expect(output).toContain('Unsupported language: xx');
+    expect(output).toContain('id (Bahasa Indonesia)');
   });
 
   it('should display help for backup and restore commands', () => {

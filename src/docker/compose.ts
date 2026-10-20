@@ -60,6 +60,7 @@ export function generateComposeFile(config: StackConfig, _env?: GeneratedEnv): s
   };
 
   const bind = config.network.bindAddress;
+  const lanShare = config.network.lanShare === true;
   const nativeOllama = isNativeOllama(config);
   const ollamaUrl = getOllamaUrlForContainers(config);
   // Lets containers resolve the host when Ollama runs natively on it
@@ -110,10 +111,19 @@ export function generateComposeFile(config: StackConfig, _env?: GeneratedEnv): s
       image: config.services.openwebui.image ?? DEFAULT_IMAGES.openwebui,
       container_name: `${config.projectName}-openwebui`,
       restart: 'unless-stopped',
-      ports: [`${bind}:${config.services.openwebui.port}:8080`],
+      // Only Open WebUI is published to the local network when sharing, because it has user accounts
+      ports: [`${lanShare ? '0.0.0.0' : bind}:${config.services.openwebui.port}:8080`],
       volumes: ['openwebui-data:/app/backend/data'],
       environment: {
         OLLAMA_BASE_URL: ollamaUrl,
+        // Keep the session signing key in the data volume, so recreating the container keeps people logged in
+        WEBUI_SECRET_KEY_FILE: '/app/backend/data/.webui_secret_key',
+        ...(lanShare && {
+          // Never let a shared Open WebUI run without login
+          WEBUI_AUTH: 'True',
+          // Ollama models are admin-only until made public; approved users need them to chat
+          BYPASS_MODEL_ACCESS_CONTROL: 'True',
+        }),
       },
       networks: ['pondok-ai-network'],
       depends_on: {
