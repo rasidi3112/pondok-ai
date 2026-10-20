@@ -38,7 +38,8 @@ backup-*/
 .cache/
 .npm-custom-cache/
 
-# Demo recording sources (only demo.gif is committed)
+# Demo recording sources (only the final demo.mp4 and demo.gif are committed)
 docs/demo/*.mp4
+!docs/demo/demo.mp4
 docs/demo/*.mov
 docs/demo/*.webm

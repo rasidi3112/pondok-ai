@@ -9,10 +9,10 @@ Require npx
 Require docker
 
 Set Shell "bash"
-Set FontSize 20
-Set Width 1280
-Set Height 720
-Set Padding 24
+Set FontSize 26
+Set Width 1920
+Set Height 1080
+Set Padding 40
 Set Theme "Catppuccin Mocha"
 Set TypingSpeed 45ms
 Set Framerate 30
