@@ -12,6 +12,7 @@ import { createConfigCommand } from '../commands/config.js';
 import { createModelCommand } from '../commands/model.js';
 import { createBackupCommand } from '../commands/backup.js';
 import { createRestoreCommand } from '../commands/restore.js';
+import { createShareCommand } from '../commands/share.js';
 import { showBanner, showError } from './ui.js';
 
 // Read version from package.json at build time via tsup define
@@ -45,6 +46,7 @@ export function createProgram(): Command {
   program.addCommand(createModelCommand());
   program.addCommand(createBackupCommand());
   program.addCommand(createRestoreCommand());
+  program.addCommand(createShareCommand());
 
   // Default action — show banner and help when no command is provided
   program.action(() => {
