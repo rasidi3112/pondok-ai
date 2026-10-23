@@ -12,7 +12,7 @@ ADMIN="${3:-docs/demo/classroom-admin.mp4}"
 CHAT="${4:-docs/demo/classroom-chat.mp4}"
 OUT="${OUT:-docs/demo/classroom.gif}"
 OUT_MP4="${OUT_MP4:-${OUT%.gif}.mp4}"
-WIDTH="${WIDTH:-1280}"
+WIDTH="${WIDTH:-1920}"
 FPS="${FPS:-15}"
 TERMINAL_CUT="${TERMINAL_CUT:-0 9 1}"
 SIGNUP_CUT="${SIGNUP_CUT:-0 99 1}"
@@ -20,6 +20,7 @@ ADMIN_CUT="${ADMIN_CUT:-0 99 1}"
 CHAT_CUT="${CHAT_CUT:-0 99 1}"
 BOLD="${BOLD:-$(fc-match -f '%{file}' 'Inter:semibold' 2>/dev/null || true)}"
 REGULAR="${REGULAR:-$(fc-match -f '%{file}' 'Inter' 2>/dev/null || true)}"
+MODEL="${MODEL:-gemma3:1b}"
 BG=0x1e1e2e
 
 command -v ffmpeg >/dev/null || { echo "ffmpeg is required" >&2; exit 1; }
@@ -58,7 +59,7 @@ scene admin "$ADMIN" full 380 900 \
   "Admin Panel > Users, role Pending to User."
 scene chat "$CHAT" phone 880 420 \
   "Rani asks in Indonesian" \
-  "The answer comes from llama3.2:3b\nrunning on the teacher's machine."
+  "The answer comes from $MODEL\nrunning on the teacher's machine."
 
 "$DIR/edit-clip.sh" "$TMP/terminal.mp4" "$TMP/terminal-cut.mp4" "$TERMINAL_CUT" >/dev/null
 "$DIR/edit-clip.sh" "$TMP/signup.mp4" "$TMP/signup-cut.mp4" "$SIGNUP_CUT" >/dev/null

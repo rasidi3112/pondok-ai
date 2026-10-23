@@ -19,10 +19,10 @@ LLM setempat, UI sembang, carian vektor dan API yang serasi dengan OpenAI, disat
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="Demo pondok-ai: init, up, kemudian bersembang dengan llama3.2:3b dalam Open WebUI" width="100%">
+  <img src="docs/demo/demo.gif" alt="Demo pondok-ai: init, up, kemudian bersembang dengan gemma3:1b dalam Open WebUI" width="100%">
 </a>
 
-<sub>Daripada folder kosong hingga balasan daripada model setempat. Dirakam pada mesin CPU sahaja dengan imej dan model yang telah dimuat turun lebih awal; masa menunggu dipercepatkan dan dilabel pada skrin.<br>
+<sub>Daripada folder kosong hingga balasan daripada model setempat. Dirakam pada Mac Apple M1 dengan Ollama asli (GPU Metal), dengan imej dan model yang telah dimuat turun lebih awal; masa menunggu Open WebUI bermula dipercepatkan dan dilabel pada skrin. Ruang cakera kosong Mac itu kurang daripada 10 GB, jadi <code>init</code> dijalankan dengan <code>--force</code>.<br>
 <a href="docs/demo/demo.mp4"><b>▶ Tonton video 1080p</b></a></sub>
 
 <br>
@@ -78,6 +78,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+Permulaan pertama boleh mengambil masa beberapa minit kerana Open WebUI memuat turun model sokongannya. Pada Mac dengan Ollama asli, `up` turut memulakan Ollama jika ia belum berjalan. Jika belum ada model dipasang, `up` memberitahu model yang sesuai dengan RAM anda.
+
 **3. Pilih dan pasang model**
 
 ```bash
@@ -117,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## Tangkapan Skrin
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI menjawab soalan dengan llama3.2:3b yang berjalan secara setempat" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI menjawab soalan dengan gemma3:1b yang berjalan secara setempat" width="100%">
   <br>
-  <sub>Open WebUI bersembang dengan <code>llama3.2:3b</code>, dihidangkan oleh kontena Ollama setempat.</sub>
+  <sub>Open WebUI bersembang dengan <code>gemma3:1b</code>, dihidangkan oleh Ollama asli pada Mac Apple M1.</sub>
 </p>
 
 <table>
@@ -247,9 +249,11 @@ Lihat [Rujukan Gerbang API](./docs/api-reference.md) untuk setiap titik akhir.
 
 Setiap permintaan tarik menjalankan ujian hujung ke hujung pada GitHub Actions (amd64 dan arm64): init, up, menarik model yang sangat kecil (smollm:135m, kira-kira 90 MB), menyenaraikannya melalui /v1/models, permintaan /v1/chat/completions tanpa penstriman, had kadar (401 dan 429), dan semakan bahawa halaman permulaan Open WebUI memberikan respons. Belum diliputi: respons penstriman, embedding, pecutan GPU dan hos macOS/Windows.
 
+Turut diuji secara manual pada Mac Apple M1 dengan Docker Desktop dan Ollama daripada Homebrew (0.5.2): `init` dengan pratetapan `minimal` dan Ollama asli, `up`, log masuk ke Open WebUI, bersembang dengan `gemma3:1b`, dan membuka `pondok-ai share` daripada telefon pada Wi-Fi yang sama.
+
 ## Batasan yang diketahui
 
-- Belum diuji pada hos macOS atau Windows sebenar.
+- Belum diuji pada hos Windows. macOS telah diuji secara manual pada Apple Silicon (lihat di atas), tetapi belum dalam CI.
 - Pada Apple Silicon, kontena Docker tidak dapat menggunakan GPU. Jalankan `pondok-ai init --native-ollama` untuk menggunakan Ollama yang dipasang secara asli dengan Metal; lihat [panduan GPU](./docs/gpu-setup.md).
 - Pecutan GPU, respons penstriman dan embedding belum diliputi oleh CI.
 - Saiz imej besar (beberapa GB). Sediakan ruang cakera kosong yang mencukupi; ruang kerja awan 32 GB dengan baki 19 GB kehabisan ruang ketika mengekstrak imej Ollama.

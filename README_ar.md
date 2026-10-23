@@ -19,10 +19,10 @@
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="عرض توضيحي لـ pondok-ai: الأمر init ثم up، ثم الدردشة مع llama3.2:3b في Open WebUI" width="100%">
+  <img src="docs/demo/demo.gif" alt="عرض توضيحي لـ pondok-ai: الأمر init ثم up، ثم الدردشة مع gemma3:1b في Open WebUI" width="100%">
 </a>
 
-<sub>من مجلد فارغ إلى ردّ من نموذج محلي. سُجّل على جهاز يعمل بالمعالج المركزي فقط مع تنزيل الصور والنموذج مسبقًا؛ وتم تسريع فترات الانتظار ووضع علامة عليها على الشاشة.<br>
+<sub>من مجلد فارغ إلى ردّ من نموذج محلي. سُجّل على جهاز Mac بمعالج Apple M1 مع Ollama أصلي (GPU ‏Metal) وتنزيل الصور والنموذج مسبقًا؛ وتم تسريع فترة انتظار بدء Open WebUI ووضع علامة عليها على الشاشة. كانت المساحة الحرة على قرص جهاز Mac أقل من 10 غيغابايت، لذا شُغّل <code>init</code> مع <code>--force</code>.<br>
 <a href="docs/demo/demo.mp4"><b>▶ شاهد الفيديو بدقة 1080p</b></a></sub>
 
 <br>
@@ -78,6 +78,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+قد يستغرق التشغيل الأول بضع دقائق بينما يُنزّل Open WebUI نماذجه المساعدة. على جهاز Mac مع Ollama أصلي، يشغّل `up` أيضًا Ollama إن لم يكن يعمل. وإذا لم يُثبَّت أي نموذج بعد، يخبرك `up` بالنموذج المناسب لذاكرة RAM لديك.
+
 **3. اختيار نموذج وتثبيته**
 
 ```bash
@@ -117,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## لقطات الشاشة
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI يجيب عن سؤال باستخدام llama3.2:3b الذي يعمل محليًا" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI يجيب عن سؤال باستخدام gemma3:1b الذي يعمل محليًا" width="100%">
   <br>
-  <sub>Open WebUI يتحاور مع <code>llama3.2:3b</code> الذي تقدّمه حاوية Ollama المحلية.</sub>
+  <sub>Open WebUI يتحاور مع <code>gemma3:1b</code> الذي يقدّمه Ollama أصلي على جهاز Mac بمعالج Apple M1.</sub>
 </p>
 
 <table>
@@ -247,9 +249,11 @@ console.log(completion.choices[0].message.content);
 
 يشغّل كل طلب سحب اختبارًا شاملًا على GitHub Actions ‏(amd64 وarm64): ‏init وup، وتنزيل نموذج صغير جدًا (smollm:135m، نحو 90 ميغابايت)، وعرضه عبر /v1/models، وطلب /v1/chat/completions دون بث، وتحديد المعدل (401 و429)، والتحقق من أن صفحة بدء Open WebUI تستجيب. غير مشمول بعد: الاستجابات المتدفقة، والتضمينات، وتسريع GPU، وأجهزة macOS/Windows.
 
+واختُبر يدويًا أيضًا على جهاز Mac بمعالج Apple M1 مع Docker Desktop وOllama المثبّت عبر Homebrew ‏(0.5.2): ‏`init` مع الإعداد المسبق `minimal` وOllama أصلي، و`up`، وتسجيل الدخول إلى Open WebUI، والدردشة مع `gemma3:1b`، وفتح `pondok-ai share` من هاتف على شبكة Wi-Fi نفسها.
+
 ## القيود المعروفة
 
-- لم يُختبر بعد على أجهزة macOS أو Windows حقيقية.
+- لم يُختبر بعد على أجهزة Windows. اختُبر macOS يدويًا على Apple Silicon (انظر أعلاه)، لكنه غير مشمول في CI.
 - على Apple Silicon، لا تستطيع حاويات Docker استخدام وحدة GPU. شغّل `pondok-ai init --native-ollama` لاستخدام Ollama مثبّت أصليًا مع Metal بدلًا من ذلك؛ راجع [دليل GPU](./docs/gpu-setup.md).
 - تسريع GPU والاستجابات المتدفقة والتضمينات غير مشمولة باختبارات CI بعد.
 - الصور كبيرة الحجم (عدة غيغابايت). خطّط لمساحة قرص حرة كافية؛ فقد نفدت المساحة في بيئة عمل سحابية بسعة 32 GB فيها 19 GB حرة أثناء فك صورة Ollama.

@@ -19,10 +19,10 @@
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="pondok-ai 演示：init、up，然后在 Open WebUI 中与 llama3.2:3b 对话" width="100%">
+  <img src="docs/demo/demo.gif" alt="pondok-ai 演示：init、up，然后在 Open WebUI 中与 gemma3:1b 对话" width="100%">
 </a>
 
-<sub>从一个空文件夹到本地模型给出回复。在仅有 CPU 的机器上录制，镜像和模型已预先拉取；等待过程已加速并在画面中标注。<br>
+<sub>从一个空文件夹到本地模型给出回复。在使用原生 Ollama（Metal GPU）的 Apple M1 Mac 上录制，镜像和模型已预先拉取；等待 Open WebUI 启动的过程已加速并在画面中标注。这台 Mac 的可用磁盘空间不足 10 GB，因此 <code>init</code> 使用了 <code>--force</code>。<br>
 <a href="docs/demo/demo.mp4"><b>▶ 观看 1080p 视频</b></a></sub>
 
 <br>
@@ -78,6 +78,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+首次启动时 Open WebUI 需要下载辅助模型，可能需要几分钟。在使用原生 Ollama 的 Mac 上，如果 Ollama 没有运行，`up` 也会启动它。如果还没有安装任何模型，`up` 会提示适合你内存大小的模型。
+
 **3. 选择并安装模型**
 
 ```bash
@@ -117,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## 截图
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI 使用本地运行的 llama3.2:3b 回答问题" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI 使用本地运行的 gemma3:1b 回答问题" width="100%">
   <br>
-  <sub>Open WebUI 与 <code>llama3.2:3b</code> 对话，模型由本地 Ollama 容器提供。</sub>
+  <sub>Open WebUI 与 <code>gemma3:1b</code> 对话，模型由 Apple M1 Mac 上的原生 Ollama 提供。</sub>
 </p>
 
 <table>
@@ -247,9 +249,11 @@ console.log(completion.choices[0].message.content);
 
 每个拉取请求都会在 GitHub Actions（amd64 和 arm64）上运行端到端测试：init、up、拉取一个非常小的模型（smollm:135m，约 90 MB）、通过 /v1/models 列出它、一次非流式的 /v1/chat/completions 请求、速率限制（401 和 429），以及检查 Open WebUI 起始页是否有响应。尚未覆盖：流式响应、嵌入、GPU 加速以及 macOS/Windows 主机。
 
+另外已在 Apple M1 Mac（Docker Desktop，通过 Homebrew 安装的 Ollama）上手动测试 0.5.2：使用 `minimal` 预设和原生 Ollama 运行 `init`、`up`，登录 Open WebUI，与 `gemma3:1b` 聊天，并在同一 Wi-Fi 下用手机打开 `pondok-ai share` 给出的地址。
+
 ## 已知限制
 
-- 尚未在真实的 macOS 或 Windows 主机上测试。
+- 尚未在 Windows 主机上测试。macOS 已在 Apple Silicon 上手动测试（见上文），但尚未纳入 CI。
 - 在 Apple Silicon 上，Docker 容器无法使用 GPU。运行 `pondok-ai init --native-ollama` 即可改用本机原生安装、支持 Metal 的 Ollama；参见 [GPU 指南](./docs/gpu-setup.md)。
 - GPU 加速、流式响应和嵌入尚未纳入 CI。
 - 镜像体积较大（数 GB）。请预留充足的磁盘空间；一个 32 GB、剩余 19 GB 的云端工作区在解压 Ollama 镜像时空间耗尽。

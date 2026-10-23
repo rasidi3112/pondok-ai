@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- The README demo, the classroom demo, and the chat and doctor screenshots were re-recorded on an Apple M1 Mac with a native Ollama and `gemma3:1b`. The README no longer says macOS is untested, and the quickstart mentions the first-start wait.
+
 ## [0.5.2] - 2026-10-23
 
 ### Added

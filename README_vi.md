@@ -19,10 +19,10 @@ LLM cục bộ, giao diện trò chuyện, tìm kiếm vector và API tương th
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="Demo pondok-ai: init, up, sau đó trò chuyện với llama3.2:3b trong Open WebUI" width="100%">
+  <img src="docs/demo/demo.gif" alt="Demo pondok-ai: init, up, sau đó trò chuyện với gemma3:1b trong Open WebUI" width="100%">
 </a>
 
-<sub>Từ một thư mục trống đến câu trả lời của mô hình cục bộ. Được ghi trên máy chỉ có CPU, với image và mô hình đã tải sẵn; thời gian chờ được tua nhanh và ghi chú trên màn hình.<br>
+<sub>Từ một thư mục trống đến câu trả lời của mô hình cục bộ. Được ghi trên máy Mac Apple M1 dùng Ollama cài đặt gốc (GPU Metal), với image và mô hình đã tải sẵn; thời gian chờ Open WebUI khởi động được tua nhanh và ghi chú trên màn hình. Máy Mac còn trống dưới 10 GB ổ đĩa, nên <code>init</code> được chạy với <code>--force</code>.<br>
 <a href="docs/demo/demo.mp4"><b>▶ Xem video 1080p</b></a></sub>
 
 <br>
@@ -78,6 +78,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+Lần khởi động đầu tiên có thể mất vài phút vì Open WebUI cần tải các mô hình hỗ trợ. Trên máy Mac dùng Ollama cài đặt gốc, `up` cũng khởi động Ollama nếu nó chưa chạy. Nếu chưa cài mô hình nào, `up` sẽ cho bạn biết mô hình phù hợp với RAM của máy.
+
 **3. Chọn và cài đặt mô hình**
 
 ```bash
@@ -117,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## Ảnh chụp màn hình
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI trả lời câu hỏi bằng llama3.2:3b chạy cục bộ" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI trả lời câu hỏi bằng gemma3:1b chạy cục bộ" width="100%">
   <br>
-  <sub>Open WebUI trò chuyện với <code>llama3.2:3b</code>, được phục vụ bởi container Ollama cục bộ.</sub>
+  <sub>Open WebUI trò chuyện với <code>gemma3:1b</code>, được phục vụ bởi Ollama cài đặt gốc trên máy Mac Apple M1.</sub>
 </p>
 
 <table>
@@ -247,9 +249,11 @@ Xem [Tài liệu tham khảo API Gateway](./docs/api-reference.md) để biết 
 
 Mỗi pull request chạy một bài kiểm thử đầu cuối trên GitHub Actions (amd64 và arm64): init, up, tải một mô hình rất nhỏ (smollm:135m, khoảng 90 MB), liệt kê nó qua /v1/models, một yêu cầu /v1/chat/completions không streaming, giới hạn tốc độ (401 và 429) và kiểm tra trang khởi đầu của Open WebUI có phản hồi. Chưa được kiểm thử: phản hồi streaming, embedding, tăng tốc GPU và máy chủ macOS/Windows.
 
+Cũng đã được kiểm thử thủ công trên máy Mac Apple M1 với Docker Desktop và Ollama cài qua Homebrew (0.5.2): `init` với preset `minimal` và Ollama cài đặt gốc, `up`, đăng nhập Open WebUI, trò chuyện với `gemma3:1b` và mở `pondok-ai share` từ điện thoại trong cùng mạng Wi-Fi.
+
 ## Hạn chế đã biết
 
-- Chưa được kiểm thử trên máy macOS hoặc Windows thật.
+- Chưa được kiểm thử trên máy Windows. macOS đã được kiểm thử thủ công trên Apple Silicon (xem ở trên), nhưng chưa có trong CI.
 - Trên Apple Silicon, container Docker không thể dùng GPU. Hãy chạy `pondok-ai init --native-ollama` để dùng Ollama cài đặt gốc với Metal; xem [hướng dẫn GPU](./docs/gpu-setup.md).
 - Tăng tốc GPU, phản hồi streaming và embedding chưa được CI kiểm thử.
 - Các image khá lớn (vài GB). Hãy chuẩn bị nhiều dung lượng trống; một workspace đám mây 32 GB còn trống 19 GB đã hết chỗ khi giải nén image Ollama.

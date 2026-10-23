@@ -15,7 +15,7 @@ import { join } from 'node:path';
 const url = process.env.WEBUI_URL ?? 'http://127.0.0.1:3000';
 const email = process.env.WEBUI_EMAIL ?? 'demo@example.com';
 const password = process.env.WEBUI_PASSWORD ?? 'pondok-demo-pass';
-const model = process.env.DEMO_MODEL ?? 'llama3.2:3b';
+const model = process.env.DEMO_MODEL ?? 'gemma3:1b';
 const prompt =
   process.env.DEMO_PROMPT ?? 'Explain in two sentences why running AI locally is good for privacy.';
 const out = process.env.OUT ?? 'docs/demo/browser.mp4';

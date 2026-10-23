@@ -19,10 +19,10 @@ LLM locali, un'interfaccia di chat, ricerca vettoriale e un'API compatibile con 
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="Demo di pondok-ai: init, up e poi una chat con llama3.2:3b in Open WebUI" width="100%">
+  <img src="docs/demo/demo.gif" alt="Demo di pondok-ai: init, up e poi una chat con gemma3:1b in Open WebUI" width="100%">
 </a>
 
-<sub>Da una cartella vuota alla risposta di un modello locale. Registrato su una macchina solo CPU, con immagini e modello già scaricati; le attese sono accelerate e indicate sullo schermo.<br>
+<sub>Da una cartella vuota alla risposta di un modello locale. Registrato su un Mac Apple M1 con Ollama nativo (GPU Metal), con immagini e modello già scaricati; l'attesa dell'avvio di Open WebUI è accelerata e indicata sullo schermo. Il Mac aveva meno di 10 GB di disco libero, quindi <code>init</code> viene eseguito con <code>--force</code>.<br>
 <a href="docs/demo/demo.mp4"><b>▶ Guarda il video in 1080p</b></a></sub>
 
 <br>
@@ -78,6 +78,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+Il primo avvio può richiedere alcuni minuti mentre Open WebUI scarica i suoi modelli di supporto. Su un Mac con Ollama nativo, `up` avvia anche Ollama se non è in esecuzione. Se non è ancora installato alcun modello, `up` ti indica quello adatto alla tua RAM.
+
 **3. Scegli e installa un modello**
 
 ```bash
@@ -117,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## Screenshot
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI risponde a una domanda con llama3.2:3b in esecuzione in locale" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI risponde a una domanda con gemma3:1b in esecuzione in locale" width="100%">
   <br>
-  <sub>Open WebUI in chat con <code>llama3.2:3b</code>, servito dal container Ollama locale.</sub>
+  <sub>Open WebUI in chat con <code>gemma3:1b</code>, servito da un Ollama nativo su un Mac Apple M1.</sub>
 </p>
 
 <table>
@@ -247,9 +249,11 @@ Consulta il [riferimento dell'API Gateway](./docs/api-reference.md) per tutti gl
 
 Ogni pull request esegue un test end-to-end su GitHub Actions (amd64 e arm64): init, up, download di un modello molto piccolo (smollm:135m, circa 90 MB), elenco tramite /v1/models, una richiesta /v1/chat/completions senza streaming, limitazione della frequenza (401 e 429) e un controllo che la pagina iniziale di Open WebUI risponda. Non ancora coperti: risposte in streaming, embedding, accelerazione GPU e host macOS/Windows.
 
+Testato anche a mano su un Mac Apple M1 con Docker Desktop e Ollama da Homebrew (0.5.2): `init` con il preset `minimal` e Ollama nativo, `up`, accesso a Open WebUI, chat con `gemma3:1b` e `pondok-ai share` aperto da uno smartphone sulla stessa rete Wi-Fi.
+
 ## Limitazioni note
 
-- Non ancora testato su host macOS o Windows reali.
+- Non ancora testato su host Windows. macOS è testato a mano su Apple Silicon (vedi sopra), ma non nella CI.
 - Su Apple Silicon i container Docker non possono usare la GPU. Esegui `pondok-ai init --native-ollama` per usare invece un Ollama installato nativamente con Metal; consulta la [guida GPU](./docs/gpu-setup.md).
 - Accelerazione GPU, risposte in streaming ed embedding non sono ancora coperti dalla CI.
 - Le immagini sono grandi (diversi GB). Prevedi molto spazio libero su disco; un workspace cloud da 32 GB con 19 GB liberi ha esaurito lo spazio durante l'estrazione dell'immagine di Ollama.

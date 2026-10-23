@@ -19,10 +19,10 @@
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="pondok-ai डेमो: init, up, फिर Open WebUI में llama3.2:3b के साथ चैट" width="100%">
+  <img src="docs/demo/demo.gif" alt="pondok-ai डेमो: init, up, फिर Open WebUI में gemma3:1b के साथ चैट" width="100%">
 </a>
 
-<sub>एक खाली फ़ोल्डर से लेकर लोकल मॉडल के जवाब तक। केवल CPU वाली मशीन पर रिकॉर्ड किया गया, इमेज और मॉडल पहले से डाउनलोड थे; प्रतीक्षा का समय तेज़ किया गया है और स्क्रीन पर दर्शाया गया है।<br>
+<sub>एक खाली फ़ोल्डर से लेकर लोकल मॉडल के जवाब तक। नेटिव Ollama (Metal GPU) वाले Apple M1 Mac पर रिकॉर्ड किया गया, इमेज और मॉडल पहले से डाउनलोड थे; Open WebUI के शुरू होने की प्रतीक्षा तेज़ की गई है और स्क्रीन पर दिखाई गई है। उस Mac में 10 GB से कम खाली डिस्क थी, इसलिए <code>init</code> को <code>--force</code> के साथ चलाया गया।<br>
 <a href="docs/demo/demo.mp4"><b>▶ 1080p वीडियो देखें</b></a></sub>
 
 <br>
@@ -78,6 +78,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+पहली बार शुरू होने में कुछ मिनट लग सकते हैं, क्योंकि Open WebUI अपने सहायक मॉडल डाउनलोड करता है। नेटिव Ollama वाले Mac पर, अगर Ollama नहीं चल रहा है तो `up` उसे भी शुरू कर देता है। अगर अभी कोई मॉडल इंस्टॉल नहीं है, तो `up` बताता है कि आपकी RAM के लिए कौन-सा मॉडल सही है।
+
 **3. एक मॉडल चुनें और इंस्टॉल करें**
 
 ```bash
@@ -117,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## स्क्रीनशॉट
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="लोकल रूप से चल रहे llama3.2:3b के साथ सवाल का जवाब देता Open WebUI" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="लोकल रूप से चल रहे gemma3:1b के साथ सवाल का जवाब देता Open WebUI" width="100%">
   <br>
-  <sub>लोकल Ollama कंटेनर द्वारा परोसे गए <code>llama3.2:3b</code> के साथ चैट करता Open WebUI।</sub>
+  <sub>Apple M1 Mac पर नेटिव Ollama द्वारा परोसे गए <code>gemma3:1b</code> के साथ चैट करता Open WebUI।</sub>
 </p>
 
 <table>
@@ -247,9 +249,11 @@ console.log(completion.choices[0].message.content);
 
 हर पुल रिक्वेस्ट GitHub Actions (amd64 और arm64) पर एक एंड-टू-एंड टेस्ट चलाती है: init, up, एक बहुत छोटा मॉडल पुल करना (smollm:135m, लगभग 90 MB), /v1/models से उसकी सूची देखना, एक नॉन-स्ट्रीमिंग /v1/chat/completions अनुरोध, रेट लिमिटिंग (401 और 429), और यह जाँच कि Open WebUI का स्टार्ट पेज जवाब देता है। अभी कवर नहीं: स्ट्रीमिंग रिस्पॉन्स, एम्बेडिंग, GPU एक्सेलेरेशन और macOS/Windows होस्ट।
 
+इसके अलावा Docker Desktop और Homebrew से इंस्टॉल Ollama वाले Apple M1 Mac पर 0.5.2 का हाथ से परीक्षण किया गया: `minimal` प्रीसेट और नेटिव Ollama के साथ `init`, `up`, Open WebUI में लॉग इन, `gemma3:1b` से चैट, और उसी Wi-Fi पर एक फ़ोन से खोला गया `pondok-ai share`।
+
 ## ज्ञात सीमाएँ
 
-- अभी तक असली macOS या Windows होस्ट पर परीक्षण नहीं किया गया है।
+- अभी तक Windows होस्ट पर परीक्षण नहीं किया गया है। macOS का Apple Silicon पर हाथ से परीक्षण किया गया है (ऊपर देखें), लेकिन CI में नहीं।
 - Apple Silicon पर Docker कंटेनर GPU का उपयोग नहीं कर सकते। इसके बजाय Metal के साथ नेटिव रूप से इंस्टॉल Ollama इस्तेमाल करने के लिए `pondok-ai init --native-ollama` चलाएँ; [GPU गाइड](./docs/gpu-setup.md) देखें।
 - GPU एक्सेलेरेशन, स्ट्रीमिंग रिस्पॉन्स और एम्बेडिंग अभी CI द्वारा कवर नहीं हैं।
 - इमेज बड़ी हैं (कई GB)। पर्याप्त खाली डिस्क स्पेस रखें; 19 GB खाली स्पेस वाले 32 GB क्लाउड वर्कस्पेस में Ollama इमेज निकालते समय जगह खत्म हो गई थी।
