@@ -3,7 +3,7 @@
 //   node docs/demo/record-classroom.mjs signup    # phone: open the LAN link, sign up, land on "pending"
 //   node docs/demo/record-classroom.mjs chat &    # phone: waits on the pending screen until approved, then chats
 //   node docs/demo/record-classroom.mjs admin     # desktop: approve the student in Admin Panel > Users
-// Env: SHARE_URL, ADMIN_URL, ADMIN_EMAIL, ADMIN_PASSWORD, STUDENT_NAME, STUDENT_EMAIL, STUDENT_PASSWORD,
+// Env: SHARE_URL, ADMIN_URL, ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_WAIT, STUDENT_NAME, STUDENT_EMAIL, STUDENT_PASSWORD,
 //      DEMO_PROMPT, CHROMIUM_PATH, OUT_DIR
 //
 // Like record-browser.mjs, frames are device-pixel screenshots taken in a loop, so text stays sharp.
@@ -203,11 +203,22 @@ if (step === 'admin') {
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 25 });
   };
 
-  await page.goto(`${adminUrl}/admin/users`);
   const role = page
     .locator('tr', { hasText: studentEmail })
     .locator('button[aria-label="Change User Role"]');
-  await role.waitFor({ timeout: 30_000 });
+  // With a real phone the student may sign up later, so reload until they show up (ADMIN_WAIT seconds).
+  const deadline = Date.now() + Number(process.env.ADMIN_WAIT ?? 30) * 1000;
+  for (;;) {
+    await page.goto(`${adminUrl}/admin/users`);
+    // Filter the list to the student so other accounts on this machine stay off camera.
+    const search = page.getByPlaceholder(/search/i).first();
+    if (await search.isVisible({ timeout: 10_000 }).catch(() => false)) {
+      await search.fill(studentName);
+    }
+    if (await role.isVisible({ timeout: 5_000 }).catch(() => false)) break;
+    if (Date.now() > deadline) throw new Error(`${studentEmail} did not sign up in time`);
+    await page.waitForTimeout(5_000);
+  }
   await page.mouse.move(700, 450);
   await page.waitForTimeout(800);
   const stop = startRecording(page);

@@ -1,7 +1,7 @@
 # Terminal half of the README demo (pondok-ai init, then up).
 # Render with VHS (https://github.com/charmbracelet/vhs):
 #   vhs docs/demo/demo.tape
-# See docs/demo/RECORDING.md for the full recording script.
+# Recorded on an Apple Silicon Mac with a native Ollama; see docs/demo/RECORDING.md.
 
 Output docs/demo/terminal.mp4
 
@@ -24,7 +24,7 @@ Enter
 Show
 
 Sleep 500ms
-Type "npx pondok-ai init --preset minimal --yes"
+Type "npx pondok-ai init --preset minimal --native-ollama --yes"
 Sleep 400ms
 Enter
 Sleep 8s
