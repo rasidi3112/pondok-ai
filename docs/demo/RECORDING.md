@@ -5,8 +5,8 @@ The demo at the top of the README shows the whole first-run path in about 30 sec
 It is built from two 1080p clips, a scripted terminal clip and a scripted browser clip, stitched with ffmpeg into
 `docs/demo/demo.mp4` (1920×1080, the sharp version) and `docs/demo/demo.gif` (1920px, the inline preview).
 The committed take was recorded on an Apple M1 MacBook Pro (16 GB) with Docker Desktop and a native Ollama
-(Metal GPU), using `gemma3:1b`. `chat.png` and `doctor.png` come from the same setup; `model-recommend.png` is from
-an earlier take on a Linux machine without a GPU.
+(Metal GPU), using `gemma3:1b`. `chat.png`, `doctor.png`, and `model-recommend.png` (`--lang id`) come from the same
+setup.
 
 ## Storyboard (target 30s)
 
