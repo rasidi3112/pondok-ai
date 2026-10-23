@@ -24,7 +24,7 @@ Enter
 Show
 
 Sleep 500ms
-Type "npx pondok-ai init --preset minimal --native-ollama --yes"
+Type "npx pondok-ai init --preset minimal --native-ollama --force --yes"
 Sleep 400ms
 Enter
 Sleep 8s
