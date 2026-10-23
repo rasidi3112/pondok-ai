@@ -7,6 +7,7 @@ import { LEGACY_DEFAULT_API_IMAGE, upgradeLegacyDefaultImages } from '../config/
 import type { StackConfig } from '../config/schema.js';
 import { DockerClient } from '../docker/client.js';
 import { generateComposeFile } from '../docker/compose.js';
+import { DEFAULT_HEALTH_TIMEOUT_SECONDS } from '../docker/health.js';
 import { showError, showSuccess } from '../cli/ui.js';
 import { copyGatewayBuildContext } from '../system/resources.js';
 import { writeFile } from '../utils/fs.js';
@@ -30,7 +31,11 @@ export function createUpdateCommand(): Command {
       '--upgrade-images',
       "Upgrade legacy default image tags to this CLI version's pinned tags",
     )
-    .option('-t, --timeout <seconds>', 'Timeout in seconds for post-update health checks', '45')
+    .option(
+      '-t, --timeout <seconds>',
+      'Timeout in seconds for post-update health checks',
+      String(DEFAULT_HEALTH_TIMEOUT_SECONDS),
+    )
     .action(async (options: UpdateOptions) => {
       await runUpdate(options);
     });
@@ -128,7 +133,8 @@ async function runUpdate(options: UpdateOptions): Promise<void> {
 
       restartSpinner.text = 'Verifying service health after update...';
       const { waitForServicesHealthy } = await import('../docker/health.js');
-      const timeoutSec = parseInt(options.timeout ?? '45', 10);
+      const parsedTimeout = parseInt(options.timeout ?? '', 10);
+      const timeoutSec = parsedTimeout > 0 ? parsedTimeout : DEFAULT_HEALTH_TIMEOUT_SECONDS;
       const healthCheck = await waitForServicesHealthy(config, docker, timeoutSec, (msg) => {
         restartSpinner.text = msg;
       });
@@ -136,9 +142,11 @@ async function runUpdate(options: UpdateOptions): Promise<void> {
       if (healthCheck.allHealthy) {
         restartSpinner.succeed('All configured images are running and healthy');
       } else {
+        const pending = [...healthCheck.results.values()].filter((r) => !r.healthy);
         restartSpinner.warn(
-          'Configured images started, but some services took longer than expected',
+          `Configured images started, but not ready after ${timeoutSec}s: ${pending.map((r) => r.displayName).join(', ')}`,
         );
+        logger.raw('  Check progress with "pondok-ai status" or "pondok-ai logs".\n');
       }
     } else if (!isRunning) {
       showSuccess('Configured images refreshed. Start the stack with "pondok-ai up".');

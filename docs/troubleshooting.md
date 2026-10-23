@@ -76,6 +76,25 @@ This verifies:
 
 ---
 
+### Open WebUI refuses connections right after `pondok-ai up`
+**Symptom**: `http://localhost:3000` shows `ERR_CONNECTION_REFUSED` or `ERR_EMPTY_RESPONSE` for a few minutes after the first `pondok-ai up`.
+**Cause**: On first start Open WebUI downloads its support models before it accepts connections. This can take several minutes on a slow connection.
+**Solution**:
+- `pondok-ai up` waits up to 5 minutes for it and says "still starting" if it is not ready by then. Wait longer with `pondok-ai up --timeout 600`.
+- Follow its progress with `pondok-ai status` and `pondok-ai logs openwebui --follow`. The page loads once the logs show the server listening on port 8080.
+
+---
+
+### Native Ollama is not reachable (macOS)
+**Symptom**: `pondok-ai up` warns `Native Ollama is not reachable on port 11434 and could not be started automatically.`
+**Cause**: `up` tries to open the Ollama app and then `ollama serve`, and neither answered on the port within 30 seconds.
+**Solution**:
+- Check that Ollama is installed: `ollama --version`. If not, run `brew install ollama` or download it from https://ollama.com/download.
+- Start it yourself with `ollama serve` or by opening the Ollama app, then run `pondok-ai up` again.
+- If `up` started it with `ollama serve`, its output is in `.pondok-ai/ollama.log`.
+
+---
+
 ### Checking Container Logs
 To inspect live logs from any service:
 ```bash

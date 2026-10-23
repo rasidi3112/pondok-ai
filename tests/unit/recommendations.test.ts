@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   evaluateModel,
+  getDefaultModel,
   getModelRecommendations,
   validateModelFit,
   estimateModelSpec,
@@ -100,6 +101,19 @@ describe('Smart Hardware Detection & Model Recommendations', () => {
 
       expect(report.recommendedDefault.parameterSize).toMatch(/(14B|8B)/);
       expect(report.compatibleModels.some((m) => m.model.name === 'deepseek-r1:14b')).toBe(true);
+    });
+  });
+
+  describe('getDefaultModel', () => {
+    it('should pick the same default as the full recommendation report', () => {
+      for (const totalMemoryGB of [4, 8, 16, 32, 64]) {
+        const report = getModelRecommendations(createMockSystem({ totalMemoryGB }));
+        expect(getDefaultModel(totalMemoryGB).name).toBe(report.recommendedDefault.name);
+      }
+    });
+
+    it('should suggest a small model on a 8GB Mac', () => {
+      expect(getDefaultModel(8).name).toBe('llama3.2:3b');
     });
   });
 

@@ -311,6 +311,25 @@ export function evaluateModel(model: ModelSpec, system: SystemInfo): ModelRecomm
 }
 
 /**
+ * The model to suggest first for a machine with this much memory.
+ */
+export function getDefaultModel(totalMemoryGB: number, language?: string): ModelSpec {
+  const languageDefault = language
+    ? LANGUAGE_DEFAULTS[language]?.find((d) => totalMemoryGB < d.belowRamGB)
+    : undefined;
+  if (languageDefault) {
+    return POPULAR_MODELS.find((m) => m.name === languageDefault.model)!;
+  } else if (totalMemoryGB < 8) {
+    return POPULAR_MODELS.find((m) => m.name === 'llama3.2:1b')!;
+  } else if (totalMemoryGB < 16) {
+    return POPULAR_MODELS.find((m) => m.name === 'llama3.2:3b')!;
+  } else if (totalMemoryGB < 32) {
+    return POPULAR_MODELS.find((m) => m.name === 'llama3.1:8b') ?? POPULAR_MODELS.find((m) => m.name === 'llama3.2:3b')!;
+  }
+  return POPULAR_MODELS.find((m) => m.name === 'deepseek-r1:14b') ?? POPULAR_MODELS.find((m) => m.name === 'llama3.1:8b')!;
+}
+
+/**
  * Generate a complete recommendation report tailored to detected hardware.
  */
 export function getModelRecommendations(
@@ -327,22 +346,7 @@ export function getModelRecommendations(
   const tight = evaluated.filter((e) => e.tier === 'tight');
   const incompatible = evaluated.filter((e) => e.tier === 'incompatible');
 
-  // Choose recommended default
-  let defaultModel: ModelSpec;
-  const languageDefault = language
-    ? LANGUAGE_DEFAULTS[language]?.find((d) => system.totalMemoryGB < d.belowRamGB)
-    : undefined;
-  if (languageDefault) {
-    defaultModel = POPULAR_MODELS.find((m) => m.name === languageDefault.model)!;
-  } else if (system.totalMemoryGB < 8) {
-    defaultModel = POPULAR_MODELS.find((m) => m.name === 'llama3.2:1b')!;
-  } else if (system.totalMemoryGB < 16) {
-    defaultModel = POPULAR_MODELS.find((m) => m.name === 'llama3.2:3b')!;
-  } else if (system.totalMemoryGB < 32) {
-    defaultModel = POPULAR_MODELS.find((m) => m.name === 'llama3.1:8b') ?? POPULAR_MODELS.find((m) => m.name === 'llama3.2:3b')!;
-  } else {
-    defaultModel = POPULAR_MODELS.find((m) => m.name === 'deepseek-r1:14b') ?? POPULAR_MODELS.find((m) => m.name === 'llama3.1:8b')!;
-  }
+  const defaultModel = getDefaultModel(system.totalMemoryGB, language);
 
   const summary = `Detected ${system.totalMemoryGB}GB RAM, ${system.cpuCount} CPU cores${system.gpuAvailable ? `, and ${system.gpuInfo}` : ''}.`;
 

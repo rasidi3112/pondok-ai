@@ -27,7 +27,7 @@ export const SERVICE_REGISTRY: Record<string, ServiceMeta> = {
     displayName: 'Open WebUI',
     description: 'Chat interface for Ollama',
     defaultPort: 3000,
-    healthEndpoint: 'http://localhost:3000/',
+    healthEndpoint: 'http://localhost:3000/health',
     docsUrl: 'https://github.com/open-webui/open-webui',
     isInternal: false,
   },

@@ -13,6 +13,33 @@ export interface ServiceHealthResult {
 }
 
 /**
+ * How long `up` and `update` wait for services by default. Open WebUI downloads its
+ * support models on first start, which takes a few minutes on a typical connection.
+ */
+export const DEFAULT_HEALTH_TIMEOUT_SECONDS = 300;
+
+/**
+ * Seconds after which the progress line explains why Open WebUI is slow on first start.
+ */
+const FIRST_START_HINT_AFTER_SECONDS = 20;
+
+/**
+ * Progress line shown while waiting, naming the services that are not ready yet.
+ */
+export function formatHealthProgress(
+  pending: Array<{ key: string; displayName: string }>,
+  total: number,
+  elapsedSeconds: number,
+): string {
+  const names = pending.map((p) => p.displayName).join(', ');
+  let line = `Waiting for ${names || 'services'} (${total - pending.length}/${total} ready, ${elapsedSeconds}s)...`;
+  if (pending.some((p) => p.key === 'openwebui') && elapsedSeconds >= FIRST_START_HINT_AFTER_SECONDS) {
+    line += ' On first start Open WebUI downloads its support models, which can take a few minutes.';
+  }
+  return line;
+}
+
+/**
  * Check health of a single HTTP service with a short timeout.
  */
 export async function checkHttpEndpoint(url: string, timeoutMs: number = 2000): Promise<{ ok: boolean; status?: number; error?: string }> {
@@ -41,7 +68,7 @@ export async function checkHttpEndpoint(url: string, timeoutMs: number = 2000): 
 export async function waitForServicesHealthy(
   config: StackConfig,
   docker: DockerClient,
-  timeoutSeconds: number = 45,
+  timeoutSeconds: number = DEFAULT_HEALTH_TIMEOUT_SECONDS,
   onProgress?: (summary: string) => void,
 ): Promise<{ allHealthy: boolean; results: Map<string, ServiceHealthResult> }> {
   const startTime = Date.now();
@@ -143,7 +170,8 @@ export async function waitForServicesHealthy(
     }
 
     if (onProgress) {
-      onProgress(`Waiting for services to become healthy (${currentHealthyCount}/${servicesToCheck.length} ready, ${elapsedSec}s)...`);
+      const pending = servicesToCheck.filter((svc) => !results.get(svc.key)!.healthy);
+      onProgress(formatHealthProgress(pending, servicesToCheck.length, elapsedSec));
     }
 
     if (currentHealthyCount === servicesToCheck.length) {
