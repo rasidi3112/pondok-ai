@@ -38,7 +38,8 @@ export interface RecommendationOptions {
 }
 
 export interface RecommendationReport {
-  recommendedDefault: ModelSpec;
+  /** The model to suggest first, or null when no chat model runs comfortably on this machine. */
+  recommendedDefault: ModelSpec | null;
   compatibleModels: ModelRecommendation[];
   tightModels: ModelRecommendation[];
   incompatibleModels: ModelRecommendation[];
@@ -270,9 +271,14 @@ const LANGUAGE_DEFAULTS: Record<string, Array<{ belowRamGB: number; model: strin
 };
 
 /**
+ * The parts of SystemInfo that decide whether a model fits.
+ */
+export type ModelFitInputs = Pick<SystemInfo, 'totalMemoryGB' | 'diskFreeGB' | 'vramGB'>;
+
+/**
  * Evaluate compatibility of a specific model against system hardware.
  */
-export function evaluateModel(model: ModelSpec, system: SystemInfo): ModelRecommendation {
+export function evaluateModel(model: ModelSpec, system: ModelFitInputs): ModelRecommendation {
   const ram = system.totalMemoryGB;
   const freeDisk = system.diskFreeGB ?? 50; // Assume sufficient if undetermined
   const vram = system.vramGB;
@@ -330,6 +336,31 @@ export function getDefaultModel(totalMemoryGB: number, language?: string): Model
 }
 
 /**
+ * The model to suggest first on this machine, checked against RAM and free disk.
+ * Keeps the RAM-based default when it runs comfortably. Otherwise falls back to the
+ * largest compatible chat model that is no bigger than that default, or null when none is.
+ */
+export function pickDefaultModel(system: ModelFitInputs, language?: string): ModelSpec | null {
+  const preferred = getDefaultModel(system.totalMemoryGB, language);
+  if (evaluateModel(preferred, system).tier === 'compatible') {
+    return preferred;
+  }
+
+  const candidates = POPULAR_MODELS.filter(
+    (m) =>
+      (m.category === 'general' || m.category === 'compact') &&
+      (!language || m.languages?.includes(language)) &&
+      m.recommendedRamGB <= preferred.recommendedRamGB &&
+      evaluateModel(m, system).tier === 'compatible',
+  );
+
+  return candidates.reduce<ModelSpec | null>(
+    (best, m) => (!best || m.recommendedRamGB > best.recommendedRamGB ? m : best),
+    null,
+  );
+}
+
+/**
  * Generate a complete recommendation report tailored to detected hardware.
  */
 export function getModelRecommendations(
@@ -346,7 +377,7 @@ export function getModelRecommendations(
   const tight = evaluated.filter((e) => e.tier === 'tight');
   const incompatible = evaluated.filter((e) => e.tier === 'incompatible');
 
-  const defaultModel = getDefaultModel(system.totalMemoryGB, language);
+  const defaultModel = pickDefaultModel(system, language);
 
   const summary = `Detected ${system.totalMemoryGB}GB RAM, ${system.cpuCount} CPU cores${system.gpuAvailable ? `, and ${system.gpuInfo}` : ''}.`;
 

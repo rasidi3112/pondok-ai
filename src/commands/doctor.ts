@@ -81,7 +81,11 @@ async function showRecommendations(system: SystemInfo): Promise<void> {
 
   console.log();
   console.log(chalk.bold('Model Recommendations:'));
-  console.log(`  → Recommended default: ${chalk.green.bold(report.recommendedDefault.name)} (${report.recommendedDefault.displayName})`);
+  if (report.recommendedDefault) {
+    console.log(`  → Recommended default: ${chalk.green.bold(report.recommendedDefault.name)} (${report.recommendedDefault.displayName})`);
+  } else {
+    console.log(chalk.yellow('  → No chat model runs comfortably on this machine right now. Freeing disk space usually helps.'));
+  }
   console.log(`  → ${report.compatibleModels.length} models verified compatible with your hardware.`);
   console.log(chalk.gray('  → Run "pondok-ai model recommend" to inspect the full compatibility matrix.\n'));
 }

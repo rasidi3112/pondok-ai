@@ -162,9 +162,15 @@ async function recommendModels(options: ModelOptions = {}): Promise<void> {
   }
 
   console.log(chalk.bold('Recommended Default Model:'));
-  console.log(`  ${chalk.green.bold(report.recommendedDefault.name)} (${report.recommendedDefault.displayName})`);
-  console.log(`  ${chalk.gray(report.recommendedDefault.description)}`);
-  console.log(`  Disk: ~${report.recommendedDefault.diskSizeGB} GB | RAM: ${report.recommendedDefault.minRamGB}-${report.recommendedDefault.recommendedRamGB} GB`);
+  const recommended = report.recommendedDefault;
+  if (recommended) {
+    console.log(`  ${chalk.green.bold(recommended.name)} (${recommended.displayName})`);
+    console.log(`  ${chalk.gray(recommended.description)}`);
+    console.log(`  Disk: ~${recommended.diskSizeGB} GB | RAM: ${recommended.minRamGB}-${recommended.recommendedRamGB} GB`);
+  } else {
+    console.log(`  ${chalk.yellow('None. No chat model runs comfortably on this machine right now.')}`);
+    console.log(`  ${chalk.gray('See the reasons below. Freeing disk space usually helps.')}`);
+  }
   console.log();
 
   console.log(chalk.bold('Compatible Models (Ready to run comfortably):'));

@@ -3,6 +3,7 @@ import {
   evaluateModel,
   getDefaultModel,
   getModelRecommendations,
+  pickDefaultModel,
   validateModelFit,
   estimateModelSpec,
   POPULAR_MODELS,
@@ -82,7 +83,7 @@ describe('Smart Hardware Detection & Model Recommendations', () => {
       const system = createMockSystem({ totalMemoryGB: 4, diskFreeGB: 30 });
       const report = getModelRecommendations(system);
 
-      expect(report.recommendedDefault.name).toBe('llama3.2:1b');
+      expect(report.recommendedDefault?.name).toBe('llama3.2:1b');
       expect(report.compatibleModels.length).toBeGreaterThan(0);
       expect(report.incompatibleModels.some((m) => m.model.name === 'llama3.1:70b')).toBe(true);
     });
@@ -91,7 +92,7 @@ describe('Smart Hardware Detection & Model Recommendations', () => {
       const system = createMockSystem({ totalMemoryGB: 16, diskFreeGB: 60 });
       const report = getModelRecommendations(system);
 
-      expect(report.recommendedDefault.name).toBe('llama3.1:8b');
+      expect(report.recommendedDefault?.name).toBe('llama3.1:8b');
       expect(report.compatibleModels.some((m) => m.model.name === 'llama3.2:3b')).toBe(true);
     });
 
@@ -99,7 +100,7 @@ describe('Smart Hardware Detection & Model Recommendations', () => {
       const system = createMockSystem({ totalMemoryGB: 64, diskFreeGB: 200 });
       const report = getModelRecommendations(system);
 
-      expect(report.recommendedDefault.parameterSize).toMatch(/(14B|8B)/);
+      expect(report.recommendedDefault?.parameterSize).toMatch(/(14B|8B)/);
       expect(report.compatibleModels.some((m) => m.model.name === 'deepseek-r1:14b')).toBe(true);
     });
   });
@@ -108,7 +109,7 @@ describe('Smart Hardware Detection & Model Recommendations', () => {
     it('should pick the same default as the full recommendation report', () => {
       for (const totalMemoryGB of [4, 8, 16, 32, 64]) {
         const report = getModelRecommendations(createMockSystem({ totalMemoryGB }));
-        expect(getDefaultModel(totalMemoryGB).name).toBe(report.recommendedDefault.name);
+        expect(getDefaultModel(totalMemoryGB).name).toBe(report.recommendedDefault?.name);
       }
     });
 
@@ -199,7 +200,7 @@ describe('Smart Hardware Detection & Model Recommendations', () => {
     it('should pick an Indonesian-capable default for each machine size', () => {
       const pick = (ram: number) =>
         getModelRecommendations(createMockSystem({ totalMemoryGB: ram }), { language: 'id' })
-          .recommendedDefault.name;
+          .recommendedDefault?.name;
 
       expect(pick(4)).toBe('qwen2.5:1.5b');
       expect(pick(8)).toBe('gemma3:4b');
@@ -209,7 +210,69 @@ describe('Smart Hardware Detection & Model Recommendations', () => {
 
     it('should keep the default list unchanged without a language', () => {
       const report = getModelRecommendations(createMockSystem({ totalMemoryGB: 8 }));
-      expect(report.recommendedDefault.name).toBe('llama3.2:3b');
+      expect(report.recommendedDefault?.name).toBe('llama3.2:3b');
+    });
+  });
+
+  describe('Default model on a machine low on disk', () => {
+    const isCompatible = (report: ReturnType<typeof getModelRecommendations>) =>
+      report.compatibleModels.some((r) => r.model.name === report.recommendedDefault?.name);
+
+    // A 16GB M1 Mac with 5.2GB free used to get gemma3:12b while the same report listed it as incompatible
+    it('should not recommend a model it lists as incompatible', () => {
+      const report = getModelRecommendations(createMockSystem({ diskFreeGB: 5.2 }), { language: 'id' });
+
+      expect(report.incompatibleModels.map((r) => r.model.name)).toContain('gemma3:12b');
+      expect(report.recommendedDefault?.name).toBe('qwen2.5:3b');
+      expect(isCompatible(report)).toBe(true);
+    });
+
+    it('should fall back to a smaller model without a language too', () => {
+      const report = getModelRecommendations(createMockSystem({ diskFreeGB: 5.3 }));
+
+      expect(report.recommendedDefault?.name).toBe('gemma3:4b');
+      expect(isCompatible(report)).toBe(true);
+    });
+
+    it('should keep the usual default when it fits', () => {
+      const report = getModelRecommendations(createMockSystem({ diskFreeGB: 10.1 }), { language: 'id' });
+      expect(report.recommendedDefault?.name).toBe('gemma3:12b');
+    });
+
+    it('should never pick an embedding model as the default', () => {
+      // bge-m3 still fits here, but it cannot chat
+      const report = getModelRecommendations(createMockSystem({ diskFreeGB: 3.3 }), { language: 'id' });
+
+      expect(report.compatibleModels.map((r) => r.model.name)).toContain('bge-m3');
+      expect(report.recommendedDefault?.name).toBe('qwen2.5:1.5b');
+    });
+
+    it('should recommend nothing when no chat model fits', () => {
+      const report = getModelRecommendations(createMockSystem({ diskFreeGB: 2 }), { language: 'id' });
+
+      expect(report.compatibleModels).toHaveLength(0);
+      expect(report.recommendedDefault).toBeNull();
+    });
+
+    it('should only ever pick a compatible model', () => {
+      for (const totalMemoryGB of [2, 4, 8, 12, 16, 24, 32, 64]) {
+        for (const diskFreeGB of [1, 3, 4, 5.2, 6, 8.4, 10, 12, 50, 200]) {
+          for (const language of [undefined, 'id']) {
+            const report = getModelRecommendations(createMockSystem({ totalMemoryGB, diskFreeGB }), { language });
+            if (report.recommendedDefault) {
+              expect(isCompatible(report)).toBe(true);
+            }
+          }
+        }
+      }
+    });
+
+    it('should not pick a bigger model than the default for this much RAM', () => {
+      const system = createMockSystem({ totalMemoryGB: 8, diskFreeGB: 4 });
+      const pick = pickDefaultModel(system)!;
+
+      expect(pick.recommendedRamGB).toBeLessThanOrEqual(getDefaultModel(8).recommendedRamGB);
+      expect(evaluateModel(pick, system).tier).toBe('compatible');
     });
   });
 });

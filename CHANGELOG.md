@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - The README demo, the classroom demo, and the chat and doctor screenshots were re-recorded on an Apple M1 Mac with a native Ollama and `gemma3:1b`. The README no longer says macOS is untested, and the quickstart mentions the first-start wait.
 
+### Fixed
+- `model recommend`, `doctor`, and the hint from `up` no longer recommend a model that does not fit on disk. The default was picked from RAM alone, so a 16 GB Mac with 5 GB free was told to install `gemma3:12b` (`--lang id`) or `llama3.1:8b` while the same report listed it as incompatible. The default now falls back to the largest compatible chat model, and when no chat model fits, the output says so and suggests freeing disk space.
+
 ## [0.5.2] - 2026-10-23
 
 ### Added
