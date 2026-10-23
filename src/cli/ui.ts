@@ -78,8 +78,12 @@ export function showServiceStatus(statuses: ServiceStatus[]): void {
 /**
  * Display the URLs for all enabled services after startup.
  */
-export function showServiceUrls(config: StackConfig): void {
-  console.log(chalk.bold.green('\n🎉 Your pondok-ai stack is ready!\n'));
+export function showServiceUrls(config: StackConfig, options: { ready?: boolean } = {}): void {
+  if (options.ready === false) {
+    console.log(chalk.bold.yellow('\n⏳ Your pondok-ai stack is still starting. These addresses work once it is ready:\n'));
+  } else {
+    console.log(chalk.bold.green('\n🎉 Your pondok-ai stack is ready!\n'));
+  }
 
   const services = config.services;
   const bind = config.network.bindAddress === '0.0.0.0' ? 'localhost' : config.network.bindAddress;

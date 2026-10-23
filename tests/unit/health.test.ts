@@ -1,6 +1,11 @@
 import { describe, it, expect, afterAll, beforeAll } from 'vitest';
 import { createServer, Server } from 'node:http';
-import { checkHttpEndpoint, waitForServicesHealthy } from '../../src/docker/health.js';
+import {
+  checkHttpEndpoint,
+  DEFAULT_HEALTH_TIMEOUT_SECONDS,
+  formatHealthProgress,
+  waitForServicesHealthy,
+} from '../../src/docker/health.js';
 import { getDefaultConfig } from '../../src/config/defaults.js';
 import { DockerClient } from '../../src/docker/client.js';
 
@@ -103,6 +108,45 @@ describe('Service Health Diagnostics', () => {
       expect(ollamaHealth?.healthy).toBe(false);
       expect(ollamaHealth?.status).toBe('unhealthy');
       expect(ollamaHealth?.message).toContain('Timeout');
+    });
+  });
+
+  describe('formatHealthProgress', () => {
+    const openwebui = { key: 'openwebui', displayName: 'Open WebUI' };
+    const api = { key: 'api', displayName: 'API Gateway' };
+
+    it('should name the services that are not ready yet', () => {
+      expect(formatHealthProgress([openwebui, api], 4, 5)).toBe(
+        'Waiting for Open WebUI, API Gateway (2/4 ready, 5s)...',
+      );
+    });
+
+    it('should explain the slow first start of Open WebUI once it takes a while', () => {
+      expect(formatHealthProgress([openwebui], 2, 5)).not.toContain('support models');
+      expect(formatHealthProgress([openwebui], 2, 30)).toContain('support models');
+      expect(formatHealthProgress([api], 2, 30)).not.toContain('support models');
+    });
+  });
+
+  describe('Default timeout', () => {
+    it('should give Open WebUI minutes, not seconds, for its first start', () => {
+      expect(DEFAULT_HEALTH_TIMEOUT_SECONDS).toBeGreaterThanOrEqual(180);
+    });
+  });
+
+  describe('Open WebUI probe', () => {
+    it('should report the Open WebUI /health endpoint, not the web page', async () => {
+      const config = getDefaultConfig('minimal');
+      config.services.ollama.enabled = false;
+      config.services.openwebui.port = 19998;
+
+      const mockDocker = {
+        status: async () => [],
+      } as unknown as DockerClient;
+
+      const report = await waitForServicesHealthy(config, mockDocker, 1);
+      expect(report.allHealthy).toBe(false);
+      expect(report.results.get('openwebui')?.url).toBe('http://127.0.0.1:19998/health');
     });
   });
 });

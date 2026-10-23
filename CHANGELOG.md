@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `up` starts a native Ollama on macOS when it is not running. It opens the Ollama app when installed and otherwise runs `ollama serve` in the background, logging to `.pondok-ai/ollama.log`. The manual hint is only shown when both fail.
+- `up` points to the recommended model for your RAM (`pondok-ai model install ...`) when Ollama has no models yet, since Open WebUI has nothing to chat with until one is installed.
+
+### Fixed
+- `up` no longer says the stack is ready while Open WebUI is still starting. On first start Open WebUI downloads its support models, which took longer than the old 45 second wait, so `localhost:3000` refused connections right after the "ready" banner. `up` and `update` now wait up to 5 minutes by default (`--timeout`), the progress line names the services still starting, Open WebUI is probed on its `/health` endpoint, and when a service is still not ready `up` says so and shows how to follow it with `pondok-ai status` and `pondok-ai logs`.
+
 ## [0.5.1] - 2026-10-20
 
 ### Fixed
