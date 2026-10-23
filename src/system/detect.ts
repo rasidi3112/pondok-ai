@@ -220,7 +220,7 @@ async function detectGPU(
   };
 }
 
-async function detectDiskFree(): Promise<number | null> {
+export async function detectDiskFree(): Promise<number | null> {
   const p = platform();
 
   try {

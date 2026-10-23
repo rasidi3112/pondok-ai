@@ -14,7 +14,8 @@ import {
   isNativeOllama,
   listOllamaModels,
 } from '../system/ollama-native.js';
-import { getDefaultModel } from '../system/recommendations.js';
+import { detectDiskFree } from '../system/detect.js';
+import { pickDefaultModel } from '../system/recommendations.js';
 import { showBanner, showServiceUrls, showError } from '../cli/ui.js';
 import { logger } from '../utils/logger.js';
 
@@ -186,8 +187,14 @@ async function showModelHint(config: StackConfig): Promise<void> {
   if (models === null || models.length > 0) return;
 
   const memoryGB = Math.round((totalmem() / (1024 * 1024 * 1024)) * 10) / 10;
+  const model = pickDefaultModel({ totalMemoryGB: memoryGB, diskFreeGB: await detectDiskFree(), vramGB: null });
   logger.warn('Ollama has no models yet, so there is nothing to chat with.');
-  logger.raw(`  Install the recommended model for this machine (${memoryGB} GB RAM):`);
-  logger.raw(`    pondok-ai model install ${getDefaultModel(memoryGB).name}`);
-  logger.raw('  Or see other options with "pondok-ai model recommend".\n');
+  if (model) {
+    logger.raw(`  Install the recommended model for this machine (${memoryGB} GB RAM):`);
+    logger.raw(`    pondok-ai model install ${model.name}`);
+    logger.raw('  Or see other options with "pondok-ai model recommend".\n');
+  } else {
+    logger.raw('  No chat model fits this machine comfortably right now. Freeing disk space usually helps.');
+    logger.raw('  See why with "pondok-ai model recommend".\n');
+  }
 }
