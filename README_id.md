@@ -79,6 +79,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+Start pertama bisa memakan waktu beberapa menit karena Open WebUI mengunduh model pendukungnya. Di Mac dengan Ollama native, `up` juga menyalakan Ollama jika belum berjalan. Jika belum ada model yang terpasang, `up` memberi tahu model yang cocok untuk RAM Anda.
+
 **3. Pilih dan instal model**
 
 ```bash
@@ -289,9 +291,11 @@ Lihat [Referensi API Gateway](./docs/api-reference.md) untuk semua endpoint.
 
 Setiap pull request menjalankan pengujian end-to-end di GitHub Actions (amd64 dan arm64): init, up, mengunduh model yang sangat kecil (smollm:135m, sekitar 90 MB), menampilkannya lewat /v1/models, permintaan /v1/chat/completions tanpa streaming, pembatasan laju (401 dan 429), dan pemeriksaan bahwa halaman awal Open WebUI merespons. Belum dicakup: respons streaming, embedding, akselerasi GPU, serta host macOS/Windows.
 
+Juga diuji secara manual di Mac Apple M1 dengan Docker Desktop dan Ollama dari Homebrew (0.5.2): `init` dengan preset `minimal` dan Ollama native, `up`, masuk ke Open WebUI, chat dengan `gemma3:1b`, serta membuka `pondok-ai share` dari ponsel di Wi-Fi yang sama.
+
 ## Keterbatasan yang diketahui
 
-- Belum diuji pada host macOS atau Windows sungguhan.
+- Belum diuji pada host Windows. macOS sudah diuji secara manual di Apple Silicon (lihat di atas), tetapi belum di CI.
 - Di Apple Silicon, container Docker tidak dapat menggunakan GPU. Jalankan `pondok-ai init --native-ollama` untuk memakai Ollama yang terinstal secara native dengan Metal; lihat [panduan GPU](./docs/gpu-setup.md).
 - Akselerasi GPU, respons streaming, dan embedding belum dicakup oleh CI.
 - Image-nya berukuran besar (beberapa GB). Siapkan ruang disk kosong yang cukup; workspace cloud 32 GB dengan 19 GB kosong pernah kehabisan ruang saat mengekstrak image Ollama.

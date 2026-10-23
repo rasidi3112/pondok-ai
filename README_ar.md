@@ -78,6 +78,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+قد يستغرق التشغيل الأول بضع دقائق بينما يُنزّل Open WebUI نماذجه المساعدة. على جهاز Mac مع Ollama أصلي، يشغّل `up` أيضًا Ollama إن لم يكن يعمل. وإذا لم يُثبَّت أي نموذج بعد، يخبرك `up` بالنموذج المناسب لذاكرة RAM لديك.
+
 **3. اختيار نموذج وتثبيته**
 
 ```bash
@@ -247,9 +249,11 @@ console.log(completion.choices[0].message.content);
 
 يشغّل كل طلب سحب اختبارًا شاملًا على GitHub Actions ‏(amd64 وarm64): ‏init وup، وتنزيل نموذج صغير جدًا (smollm:135m، نحو 90 ميغابايت)، وعرضه عبر /v1/models، وطلب /v1/chat/completions دون بث، وتحديد المعدل (401 و429)، والتحقق من أن صفحة بدء Open WebUI تستجيب. غير مشمول بعد: الاستجابات المتدفقة، والتضمينات، وتسريع GPU، وأجهزة macOS/Windows.
 
+واختُبر يدويًا أيضًا على جهاز Mac بمعالج Apple M1 مع Docker Desktop وOllama المثبّت عبر Homebrew ‏(0.5.2): ‏`init` مع الإعداد المسبق `minimal` وOllama أصلي، و`up`، وتسجيل الدخول إلى Open WebUI، والدردشة مع `gemma3:1b`، وفتح `pondok-ai share` من هاتف على شبكة Wi-Fi نفسها.
+
 ## القيود المعروفة
 
-- لم يُختبر بعد على أجهزة macOS أو Windows حقيقية.
+- لم يُختبر بعد على أجهزة Windows. اختُبر macOS يدويًا على Apple Silicon (انظر أعلاه)، لكنه غير مشمول في CI.
 - على Apple Silicon، لا تستطيع حاويات Docker استخدام وحدة GPU. شغّل `pondok-ai init --native-ollama` لاستخدام Ollama مثبّت أصليًا مع Metal بدلًا من ذلك؛ راجع [دليل GPU](./docs/gpu-setup.md).
 - تسريع GPU والاستجابات المتدفقة والتضمينات غير مشمولة باختبارات CI بعد.
 - الصور كبيرة الحجم (عدة غيغابايت). خطّط لمساحة قرص حرة كافية؛ فقد نفدت المساحة في بيئة عمل سحابية بسعة 32 GB فيها 19 GB حرة أثناء فك صورة Ollama.

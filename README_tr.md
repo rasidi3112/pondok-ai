@@ -78,6 +78,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+İlk başlatma, Open WebUI yardımcı modellerini indirirken birkaç dakika sürebilir. Yerel Ollama kullanan bir Mac'te `up`, çalışmıyorsa Ollama'yı da başlatır. Henüz kurulu bir model yoksa `up`, RAM'inize uygun olanı söyler.
+
 **3. Bir model seçip kurun**
 
 ```bash
@@ -247,9 +249,11 @@ Tüm uç noktalar için [API Ağ Geçidi Başvurusu](./docs/api-reference.md) be
 
 Her pull request, GitHub Actions üzerinde (amd64 ve arm64) uçtan uca bir test çalıştırır: init, up, çok küçük bir modelin çekilmesi (smollm:135m, yaklaşık 90 MB), /v1/models ile listelenmesi, akışsız bir /v1/chat/completions isteği, hız sınırlama (401 ve 429) ve Open WebUI başlangıç sayfasının yanıt verdiğinin kontrolü. Henüz kapsanmayanlar: akışlı yanıtlar, embedding'ler, GPU hızlandırma ve macOS/Windows ana makineleri.
 
+Ayrıca Docker Desktop ve Homebrew'dan kurulan Ollama ile bir Apple M1 Mac'te elle test edildi (0.5.2): `minimal` ön ayarı ve yerel Ollama ile `init`, `up`, Open WebUI'ye giriş, `gemma3:1b` ile sohbet ve aynı Wi-Fi'deki bir telefondan açılan `pondok-ai share`.
+
 ## Bilinen sınırlamalar
 
-- Henüz gerçek macOS veya Windows ana makinelerinde test edilmedi.
+- Henüz Windows ana makinelerinde test edilmedi. macOS, Apple Silicon üzerinde elle test edildi (yukarıya bakın), ancak CI'da değil.
 - Apple Silicon'da Docker konteynerleri GPU'yu kullanamaz. Bunun yerine Metal ile yerel olarak kurulmuş bir Ollama kullanmak için `pondok-ai init --native-ollama` komutunu çalıştırın; [GPU kılavuzuna](./docs/gpu-setup.md) bakın.
 - GPU hızlandırma, akışlı yanıtlar ve embedding'ler henüz CI kapsamında değil.
 - İmajlar büyüktür (birkaç GB). Bol miktarda boş disk alanı ayırın; 19 GB boş alanı olan 32 GB'lık bir bulut çalışma alanı, Ollama imajını açarken yer kalmadığı için başarısız oldu.

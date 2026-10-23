@@ -78,6 +78,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+Lần khởi động đầu tiên có thể mất vài phút vì Open WebUI cần tải các mô hình hỗ trợ. Trên máy Mac dùng Ollama cài đặt gốc, `up` cũng khởi động Ollama nếu nó chưa chạy. Nếu chưa cài mô hình nào, `up` sẽ cho bạn biết mô hình phù hợp với RAM của máy.
+
 **3. Chọn và cài đặt mô hình**
 
 ```bash
@@ -247,9 +249,11 @@ Xem [Tài liệu tham khảo API Gateway](./docs/api-reference.md) để biết 
 
 Mỗi pull request chạy một bài kiểm thử đầu cuối trên GitHub Actions (amd64 và arm64): init, up, tải một mô hình rất nhỏ (smollm:135m, khoảng 90 MB), liệt kê nó qua /v1/models, một yêu cầu /v1/chat/completions không streaming, giới hạn tốc độ (401 và 429) và kiểm tra trang khởi đầu của Open WebUI có phản hồi. Chưa được kiểm thử: phản hồi streaming, embedding, tăng tốc GPU và máy chủ macOS/Windows.
 
+Cũng đã được kiểm thử thủ công trên máy Mac Apple M1 với Docker Desktop và Ollama cài qua Homebrew (0.5.2): `init` với preset `minimal` và Ollama cài đặt gốc, `up`, đăng nhập Open WebUI, trò chuyện với `gemma3:1b` và mở `pondok-ai share` từ điện thoại trong cùng mạng Wi-Fi.
+
 ## Hạn chế đã biết
 
-- Chưa được kiểm thử trên máy macOS hoặc Windows thật.
+- Chưa được kiểm thử trên máy Windows. macOS đã được kiểm thử thủ công trên Apple Silicon (xem ở trên), nhưng chưa có trong CI.
 - Trên Apple Silicon, container Docker không thể dùng GPU. Hãy chạy `pondok-ai init --native-ollama` để dùng Ollama cài đặt gốc với Metal; xem [hướng dẫn GPU](./docs/gpu-setup.md).
 - Tăng tốc GPU, phản hồi streaming và embedding chưa được CI kiểm thử.
 - Các image khá lớn (vài GB). Hãy chuẩn bị nhiều dung lượng trống; một workspace đám mây 32 GB còn trống 19 GB đã hết chỗ khi giải nén image Ollama.

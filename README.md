@@ -79,6 +79,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+The first start can take a few minutes while Open WebUI downloads its support models. On a Mac with native Ollama, `up` also starts Ollama if it is not running. If no model is installed yet, `up` tells you which one fits your RAM.
+
 **3. Pick and install a model**
 
 ```bash
@@ -289,9 +291,11 @@ See the [API Gateway Reference](./docs/api-reference.md) for every endpoint.
 
 Every pull request runs an end-to-end test on GitHub Actions (amd64 and arm64): init, up, pull a very small model (smollm:135m, about 90 MB), list it via /v1/models, a non-streaming /v1/chat/completions request, rate limiting (401 and 429), and a check that Open WebUI's start page responds. Not covered yet: streaming responses, embeddings, GPU acceleration, and macOS/Windows hosts.
 
+Also tested by hand on an Apple M1 Mac with Docker Desktop and Ollama from Homebrew (0.5.2): `init` with the `minimal` preset and native Ollama, `up`, signing in to Open WebUI, chatting with `gemma3:1b`, and opening `pondok-ai share` from a phone on the same Wi-Fi.
+
 ## Known limitations
 
-- Not tested on real macOS or Windows hosts yet.
+- Not tested on Windows hosts yet. macOS is tested by hand on Apple Silicon (see above), but not in CI.
 - On Apple Silicon, Docker containers cannot use the GPU. Run `pondok-ai init --native-ollama` to use a natively installed Ollama with Metal instead; see the [GPU guide](./docs/gpu-setup.md).
 - GPU acceleration, streaming responses, and embeddings are not covered by CI yet.
 - The images are large (several GB). Plan for substantial free disk space; a 32 GB cloud workspace with 19 GB free ran out of space while extracting the Ollama image.

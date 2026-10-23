@@ -78,6 +78,8 @@ npx pondok-ai init --preset standard --yes
 npx pondok-ai up
 ```
 
+初回起動では Open WebUI が補助モデルをダウンロードするため、数分かかることがあります。ネイティブ Ollama を使う Mac では、Ollama が起動していなければ `up` が起動します。モデルがまだインストールされていない場合は、`up` が RAM に合ったモデルを案内します。
+
 **3. モデルを選んでインストールする**
 
 ```bash
@@ -247,9 +249,11 @@ console.log(completion.choices[0].message.content);
 
 すべてのプルリクエストで GitHub Actions（amd64 と arm64）のエンドツーエンドテストを実行します：init、up、ごく小さなモデル（smollm:135m、約 90 MB）の取得、/v1/models での一覧表示、ストリーミングなしの /v1/chat/completions リクエスト、レート制限（401 と 429）、そして Open WebUI のスタートページが応答するかの確認です。まだ対象外：ストリーミング応答、埋め込み、GPU アクセラレーション、macOS/Windows ホスト。
 
+さらに、Docker Desktop と Homebrew 版 Ollama を入れた Apple M1 の Mac で 0.5.2 を手動テストしました：`minimal` プリセットとネイティブ Ollama での `init`、`up`、Open WebUI へのログイン、`gemma3:1b` とのチャット、同じ Wi-Fi のスマートフォンから開いた `pondok-ai share`。
+
 ## 既知の制限事項
 
-- 実機の macOS や Windows ホストではまだテストしていません。
+- Windows ホストではまだテストしていません。macOS は Apple Silicon で手動テスト済みですが（上記参照）、CI の対象外です。
 - Apple Silicon では Docker コンテナから GPU を使えません。`pondok-ai init --native-ollama` を実行すると、代わりにネイティブインストールした Metal 対応の Ollama を使えます。詳しくは [GPU ガイド](./docs/gpu-setup.md)をご覧ください。
 - GPU アクセラレーション、ストリーミング応答、埋め込みはまだ CI の対象外です。
 - イメージは大きめ（数 GB）です。十分な空きディスク容量を確保してください。空き 19 GB の 32 GB クラウドワークスペースでは、Ollama イメージの展開中に容量が足りなくなりました。
