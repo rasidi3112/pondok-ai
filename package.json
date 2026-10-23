@@ -1,6 +1,6 @@
 {
   "name": "pondok-ai",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Run your own private AI stack locally with one command.",
   "type": "module",
   "bin": {
