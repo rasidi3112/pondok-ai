@@ -26,7 +26,7 @@ Type "clear"
 Enter
 Show
 
-Type "npx pondok-ai model recommend --lang id"
+Type "npx pondok-ai model recommend"
 Enter
 Sleep 12s
 Screenshot docs/demo/screenshots/model-recommend.png

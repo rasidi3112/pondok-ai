@@ -19,10 +19,10 @@
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="pondok-ai डेमो: init, up, फिर Open WebUI में llama3.2:3b के साथ चैट" width="100%">
+  <img src="docs/demo/demo.gif" alt="pondok-ai डेमो: init, up, फिर Open WebUI में gemma3:1b के साथ चैट" width="100%">
 </a>
 
-<sub>एक खाली फ़ोल्डर से लेकर लोकल मॉडल के जवाब तक। केवल CPU वाली मशीन पर रिकॉर्ड किया गया, इमेज और मॉडल पहले से डाउनलोड थे; प्रतीक्षा का समय तेज़ किया गया है और स्क्रीन पर दर्शाया गया है।<br>
+<sub>एक खाली फ़ोल्डर से लेकर लोकल मॉडल के जवाब तक। नेटिव Ollama (Metal GPU) वाले Apple M1 Mac पर रिकॉर्ड किया गया, इमेज और मॉडल पहले से डाउनलोड थे; Open WebUI के शुरू होने की प्रतीक्षा तेज़ की गई है और स्क्रीन पर दिखाई गई है। उस Mac में 10 GB से कम खाली डिस्क थी, इसलिए <code>init</code> को <code>--force</code> के साथ चलाया गया।<br>
 <a href="docs/demo/demo.mp4"><b>▶ 1080p वीडियो देखें</b></a></sub>
 
 <br>
@@ -119,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## स्क्रीनशॉट
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="लोकल रूप से चल रहे llama3.2:3b के साथ सवाल का जवाब देता Open WebUI" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="लोकल रूप से चल रहे gemma3:1b के साथ सवाल का जवाब देता Open WebUI" width="100%">
   <br>
-  <sub>लोकल Ollama कंटेनर द्वारा परोसे गए <code>llama3.2:3b</code> के साथ चैट करता Open WebUI।</sub>
+  <sub>Apple M1 Mac पर नेटिव Ollama द्वारा परोसे गए <code>gemma3:1b</code> के साथ चैट करता Open WebUI।</sub>
 </p>
 
 <table>

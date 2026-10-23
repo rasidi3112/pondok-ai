@@ -19,10 +19,10 @@ LLMs locais, uma interface de chat, busca vetorial e uma API compatível com a O
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="Demo do pondok-ai: init, up e depois uma conversa com o llama3.2:3b no Open WebUI" width="100%">
+  <img src="docs/demo/demo.gif" alt="Demo do pondok-ai: init, up e depois uma conversa com o gemma3:1b no Open WebUI" width="100%">
 </a>
 
-<sub>De uma pasta vazia até a resposta de um modelo local. Gravado em uma máquina só com CPU, com as imagens e o modelo baixados previamente; as esperas foram aceleradas e sinalizadas na tela.<br>
+<sub>De uma pasta vazia até a resposta de um modelo local. Gravado em um Mac com Apple M1 e Ollama nativo (GPU Metal), com as imagens e o modelo baixados previamente; a espera pela inicialização do Open WebUI foi acelerada e sinalizada na tela. O Mac tinha menos de 10 GB de disco livre, por isso o <code>init</code> roda com <code>--force</code>.<br>
 <a href="docs/demo/demo.mp4"><b>▶ Assista ao vídeo em 1080p</b></a></sub>
 
 <br>
@@ -119,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## Capturas de tela
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI respondendo a uma pergunta com o llama3.2:3b rodando localmente" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI respondendo a uma pergunta com o gemma3:1b rodando localmente" width="100%">
   <br>
-  <sub>Open WebUI conversando com o <code>llama3.2:3b</code>, servido pelo contêiner local do Ollama.</sub>
+  <sub>Open WebUI conversando com o <code>gemma3:1b</code>, servido por um Ollama nativo em um Mac com Apple M1.</sub>
 </p>
 
 <table>

@@ -36,8 +36,13 @@ function startRecording(page) {
   const recorder = (async () => {
     while (recording) {
       const file = join(frameDir, `${String(frames.length).padStart(5, '0')}.jpg`);
-      await page.screenshot({ path: file, type: 'jpeg', quality: 92 });
-      frames.push({ file, time: Date.now() });
+      // A screenshot taken mid-navigation can stall in headless Chrome; skip that frame instead of failing.
+      const ok = await page
+        .screenshot({ path: file, type: 'jpeg', quality: 92, timeout: 5_000 })
+        .then(() => true)
+        .catch(() => false);
+      if (ok) frames.push({ file, time: Date.now() });
+      else console.log(`Skipped a frame at ${new Date().toISOString()}`);
     }
   })();
   return async (out) => {
@@ -61,7 +66,8 @@ function startRecording(page) {
       '-i',
       join(frameDir, 'frames.txt'),
       '-vf',
-      'fps=30,format=yuv420p',
+      // Pixel 7 at 2x can come out an odd number of pixels tall, which libx264 rejects.
+      'fps=30,scale=trunc(iw/2)*2:trunc(ih/2)*2,format=yuv420p',
       '-c:v',
       'libx264',
       '-preset',
@@ -81,10 +87,9 @@ if (step === 'signup') {
   rmSync(approvedFlag, { force: true });
   const context = await browser.newContext(phone);
   const page = await context.newPage();
-  await page.goto('about:blank');
-  const stop = startRecording(page);
-  await page.waitForTimeout(600);
+  // Start recording once the page has loaded: a screenshot during the first navigation can stall for seconds.
   await page.goto(shareUrl);
+  const stop = startRecording(page);
   await page.locator('input[type="email"]').waitFor({ timeout: 30_000 });
   await page.waitForTimeout(1800);
   await page
@@ -215,7 +220,14 @@ if (step === 'admin') {
     if (await search.isVisible({ timeout: 10_000 }).catch(() => false)) {
       await search.fill(studentName);
     }
-    if (await role.isVisible({ timeout: 5_000 }).catch(() => false)) break;
+    // isVisible() does not wait, so give the user list time to load before reloading.
+    if (
+      await role
+        .waitFor({ state: 'visible', timeout: 5_000 })
+        .then(() => true)
+        .catch(() => false)
+    )
+      break;
     if (Date.now() > deadline) throw new Error(`${studentEmail} did not sign up in time`);
     await page.waitForTimeout(5_000);
   }

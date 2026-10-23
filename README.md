@@ -19,10 +19,10 @@ Local LLMs, a chat UI, vector search, and an OpenAI-compatible API, wired togeth
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="pondok-ai demo: init, up, then chatting with llama3.2:3b in Open WebUI" width="100%">
+  <img src="docs/demo/demo.gif" alt="pondok-ai demo: init, up, then chatting with gemma3:1b in Open WebUI" width="100%">
 </a>
 
-<sub>From an empty folder to a reply from a local model. Recorded on a CPU-only machine with images and model pre-pulled; waiting is sped up and labelled on screen.<br>
+<sub>From an empty folder to a reply from a local model. Recorded on an Apple M1 Mac with a native Ollama (Metal GPU), images and model pre-pulled; the wait for Open WebUI to start is sped up and labelled on screen. The Mac had less than 10 GB of free disk, so <code>init</code> runs with <code>--force</code>.<br>
 <a href="docs/demo/demo.mp4"><b>▶ Watch the 1080p video</b></a></sub>
 
 <br>
@@ -123,9 +123,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## Screenshots
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI answering a question with llama3.2:3b running locally" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI answering a question with gemma3:1b running locally" width="100%">
   <br>
-  <sub>Open WebUI chatting with <code>llama3.2:3b</code>, served by the local Ollama container.</sub>
+  <sub>Open WebUI chatting with <code>gemma3:1b</code>, served by a native Ollama on an Apple M1 Mac.</sub>
 </p>
 
 <table>
@@ -155,7 +155,7 @@ One machine can serve a whole classroom, office, or pesantren. Everyone on the s
   <img src="docs/demo/classroom.gif" alt="Classroom demo: pondok-ai share prints a QR code, a student signs up on a phone, the teacher approves, and the student chats in Indonesian" width="100%">
 </a>
 
-<sub>The teacher runs <code>pondok-ai share</code>, a student opens the link on a phone and signs up, the teacher approves the account, and the student asks a question in Indonesian. Recorded on a CPU-only machine; waiting for the model is sped up and labelled on screen.<br>
+<sub>The teacher runs <code>pondok-ai share</code>, a student opens the link on a phone and signs up, the teacher approves the account, and the student asks a question in Indonesian. Recorded on an Apple M1 Mac with <code>gemma3:1b</code>; the phone is a phone-sized browser on the same Wi-Fi, and nothing is sped up.<br>
 <a href="docs/demo/classroom.mp4"><b>▶ Watch the 1080p video</b></a></sub>
 
 1. Start the stack, then open http://localhost:3000 on this machine and create the admin account.

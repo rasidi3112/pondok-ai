@@ -19,10 +19,10 @@
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="pondok-ai 演示：init、up，然后在 Open WebUI 中与 llama3.2:3b 对话" width="100%">
+  <img src="docs/demo/demo.gif" alt="pondok-ai 演示：init、up，然后在 Open WebUI 中与 gemma3:1b 对话" width="100%">
 </a>
 
-<sub>从一个空文件夹到本地模型给出回复。在仅有 CPU 的机器上录制，镜像和模型已预先拉取；等待过程已加速并在画面中标注。<br>
+<sub>从一个空文件夹到本地模型给出回复。在使用原生 Ollama（Metal GPU）的 Apple M1 Mac 上录制，镜像和模型已预先拉取；等待 Open WebUI 启动的过程已加速并在画面中标注。这台 Mac 的可用磁盘空间不足 10 GB，因此 <code>init</code> 使用了 <code>--force</code>。<br>
 <a href="docs/demo/demo.mp4"><b>▶ 观看 1080p 视频</b></a></sub>
 
 <br>
@@ -119,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## 截图
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI 使用本地运行的 llama3.2:3b 回答问题" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI 使用本地运行的 gemma3:1b 回答问题" width="100%">
   <br>
-  <sub>Open WebUI 与 <code>llama3.2:3b</code> 对话，模型由本地 Ollama 容器提供。</sub>
+  <sub>Open WebUI 与 <code>gemma3:1b</code> 对话，模型由 Apple M1 Mac 上的原生 Ollama 提供。</sub>
 </p>
 
 <table>

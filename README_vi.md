@@ -19,10 +19,10 @@ LLM cục bộ, giao diện trò chuyện, tìm kiếm vector và API tương th
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="Demo pondok-ai: init, up, sau đó trò chuyện với llama3.2:3b trong Open WebUI" width="100%">
+  <img src="docs/demo/demo.gif" alt="Demo pondok-ai: init, up, sau đó trò chuyện với gemma3:1b trong Open WebUI" width="100%">
 </a>
 
-<sub>Từ một thư mục trống đến câu trả lời của mô hình cục bộ. Được ghi trên máy chỉ có CPU, với image và mô hình đã tải sẵn; thời gian chờ được tua nhanh và ghi chú trên màn hình.<br>
+<sub>Từ một thư mục trống đến câu trả lời của mô hình cục bộ. Được ghi trên máy Mac Apple M1 dùng Ollama cài đặt gốc (GPU Metal), với image và mô hình đã tải sẵn; thời gian chờ Open WebUI khởi động được tua nhanh và ghi chú trên màn hình. Máy Mac còn trống dưới 10 GB ổ đĩa, nên <code>init</code> được chạy với <code>--force</code>.<br>
 <a href="docs/demo/demo.mp4"><b>▶ Xem video 1080p</b></a></sub>
 
 <br>
@@ -119,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## Ảnh chụp màn hình
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI trả lời câu hỏi bằng llama3.2:3b chạy cục bộ" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI trả lời câu hỏi bằng gemma3:1b chạy cục bộ" width="100%">
   <br>
-  <sub>Open WebUI trò chuyện với <code>llama3.2:3b</code>, được phục vụ bởi container Ollama cục bộ.</sub>
+  <sub>Open WebUI trò chuyện với <code>gemma3:1b</code>, được phục vụ bởi Ollama cài đặt gốc trên máy Mac Apple M1.</sub>
 </p>
 
 <table>

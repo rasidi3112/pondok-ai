@@ -19,10 +19,10 @@ LLM setempat, UI sembang, carian vektor dan API yang serasi dengan OpenAI, disat
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="Demo pondok-ai: init, up, kemudian bersembang dengan llama3.2:3b dalam Open WebUI" width="100%">
+  <img src="docs/demo/demo.gif" alt="Demo pondok-ai: init, up, kemudian bersembang dengan gemma3:1b dalam Open WebUI" width="100%">
 </a>
 
-<sub>Daripada folder kosong hingga balasan daripada model setempat. Dirakam pada mesin CPU sahaja dengan imej dan model yang telah dimuat turun lebih awal; masa menunggu dipercepatkan dan dilabel pada skrin.<br>
+<sub>Daripada folder kosong hingga balasan daripada model setempat. Dirakam pada Mac Apple M1 dengan Ollama asli (GPU Metal), dengan imej dan model yang telah dimuat turun lebih awal; masa menunggu Open WebUI bermula dipercepatkan dan dilabel pada skrin. Ruang cakera kosong Mac itu kurang daripada 10 GB, jadi <code>init</code> dijalankan dengan <code>--force</code>.<br>
 <a href="docs/demo/demo.mp4"><b>▶ Tonton video 1080p</b></a></sub>
 
 <br>
@@ -119,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## Tangkapan Skrin
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI menjawab soalan dengan llama3.2:3b yang berjalan secara setempat" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI menjawab soalan dengan gemma3:1b yang berjalan secara setempat" width="100%">
   <br>
-  <sub>Open WebUI bersembang dengan <code>llama3.2:3b</code>, dihidangkan oleh kontena Ollama setempat.</sub>
+  <sub>Open WebUI bersembang dengan <code>gemma3:1b</code>, dihidangkan oleh Ollama asli pada Mac Apple M1.</sub>
 </p>
 
 <table>

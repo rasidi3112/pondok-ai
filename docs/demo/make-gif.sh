@@ -8,7 +8,7 @@ BROWSER="${2:-docs/demo/browser-cut.mp4}"
 OUT="${3:-docs/demo/demo.gif}"
 OUT_MP4="${OUT_MP4:-${OUT%.gif}.mp4}"
 VIDEO_WIDTH="${VIDEO_WIDTH:-1920}"
-WIDTH="${WIDTH:-1280}"
+WIDTH="${WIDTH:-1920}"
 FPS="${FPS:-15}"
 VIDEO_HEIGHT=$(( VIDEO_WIDTH * 9 / 16 / 2 * 2 ))
 

@@ -19,10 +19,10 @@
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="pondok-ai 데모: init, up 후 Open WebUI에서 llama3.2:3b와 채팅" width="100%">
+  <img src="docs/demo/demo.gif" alt="pondok-ai 데모: init, up 후 Open WebUI에서 gemma3:1b와 채팅" width="100%">
 </a>
 
-<sub>빈 폴더에서 로컬 모델의 답변까지. 이미지와 모델을 미리 받아 둔 CPU 전용 머신에서 녹화했으며, 대기 시간은 빠르게 재생하고 화면에 표시했습니다.<br>
+<sub>빈 폴더에서 로컬 모델의 답변까지. 네이티브 Ollama(Metal GPU)를 쓰는 Apple M1 Mac에서 이미지와 모델을 미리 받아 둔 상태로 녹화했으며, Open WebUI 시작을 기다리는 시간은 빠르게 재생하고 화면에 표시했습니다. 이 Mac은 남은 디스크 공간이 10 GB 미만이어서 <code>init</code>을 <code>--force</code>로 실행했습니다.<br>
 <a href="docs/demo/demo.mp4"><b>▶ 1080p 영상 보기</b></a></sub>
 
 <br>
@@ -119,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## 스크린샷
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="로컬에서 실행 중인 llama3.2:3b로 질문에 답하는 Open WebUI" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="로컬에서 실행 중인 gemma3:1b로 질문에 답하는 Open WebUI" width="100%">
   <br>
-  <sub>로컬 Ollama 컨테이너가 제공하는 <code>llama3.2:3b</code>와 채팅 중인 Open WebUI.</sub>
+  <sub>Apple M1 Mac의 네이티브 Ollama가 제공하는 <code>gemma3:1b</code>와 채팅 중인 Open WebUI.</sub>
 </p>
 
 <table>

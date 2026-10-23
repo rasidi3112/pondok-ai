@@ -19,10 +19,10 @@
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="Демонстрация pondok-ai: init, up, затем чат с llama3.2:3b в Open WebUI" width="100%">
+  <img src="docs/demo/demo.gif" alt="Демонстрация pondok-ai: init, up, затем чат с gemma3:1b в Open WebUI" width="100%">
 </a>
 
-<sub>От пустой папки до ответа локальной модели. Записано на машине только с CPU, образы и модель загружены заранее; ожидание ускорено и отмечено на экране.<br>
+<sub>От пустой папки до ответа локальной модели. Записано на Mac с Apple M1 и нативным Ollama (GPU Metal), образы и модель загружены заранее; ожидание запуска Open WebUI ускорено и отмечено на экране. На Mac было меньше 10 ГБ свободного места на диске, поэтому <code>init</code> запущен с <code>--force</code>.<br>
 <a href="docs/demo/demo.mp4"><b>▶ Смотреть видео в 1080p</b></a></sub>
 
 <br>
@@ -119,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## Скриншоты
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI отвечает на вопрос с помощью локально запущенной llama3.2:3b" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI отвечает на вопрос с помощью локально запущенной gemma3:1b" width="100%">
   <br>
-  <sub>Open WebUI в диалоге с <code>llama3.2:3b</code>, которую обслуживает локальный контейнер Ollama.</sub>
+  <sub>Open WebUI в диалоге с <code>gemma3:1b</code>, которую обслуживает нативный Ollama на Mac с Apple M1.</sub>
 </p>
 
 <table>

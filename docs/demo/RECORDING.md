@@ -1,19 +1,24 @@
 # Recording the README demo
 
-The demo at the top of the README shows the whole first-run path in about 35 seconds:
+The demo at the top of the README shows the whole first-run path in about 30 seconds:
 `pondok-ai init`, then `pondok-ai up`, then a chat reply in Open WebUI.
 It is built from two 1080p clips, a scripted terminal clip and a scripted browser clip, stitched with ffmpeg into
-`docs/demo/demo.mp4` (1920×1080, the sharp version) and `docs/demo/demo.gif` (1280px, the inline preview).
-The screenshots in the README come from the same setup.
+`docs/demo/demo.mp4` (1920×1080, the sharp version) and `docs/demo/demo.gif` (1920px, the inline preview).
+The committed take was recorded on an Apple M1 MacBook Pro (16 GB) with Docker Desktop and a native Ollama
+(Metal GPU), using `gemma3:1b`. `chat.png` and `doctor.png` come from the same setup; `model-recommend.png` is from
+an earlier take on a Linux machine without a GPU.
 
-## Storyboard (target 35s)
+## Storyboard (target 30s)
 
 | Time | Shot | What the viewer should notice |
 |---|---|---|
-| 0–7s | Terminal: `npx pondok-ai init --preset minimal --yes` | Hardware detection and "Stack initialized successfully!" |
+| 0–7s | Terminal: `npx pondok-ai init --preset minimal --native-ollama --yes` | Hardware detection and "Stack initialized successfully!" |
 | 7–17s | Terminal: `npx pondok-ai up` | "All services started and healthy" and the service URLs |
-| 17–22s | Browser opens http://localhost:3000 | Open WebUI is already running, model `llama3.2:3b` selected |
-| 22–35s | Prompt sent, reply streams in | A real answer from a local model, no cloud key |
+| 17–21s | Browser opens http://localhost:3000 | Open WebUI is already running, model `gemma3:1b` selected |
+| 21–27s | Prompt sent, reply streams in | A real answer from a local model, no cloud key |
+
+The recording Mac had less than the 10 GB of free disk that `init` checks for, so `demo.tape` adds `--force`.
+Drop it when you record on a machine with enough free disk.
 
 Suggested prompt (short, answers in 2–3 lines):
 
@@ -27,17 +32,18 @@ Suggested prompt (short, answers in 2–3 lines):
 
 ## 1. Prepare so nothing waits on the network
 
-Image pulls and model downloads are slow and would blow the 35s budget, so do them once before recording.
+Image pulls and model downloads are slow and would blow the 35s budget, so do them once before recording. The commands are for an Apple Silicon Mac with Ollama installed;
+leave out `--native-ollama` elsewhere.
 
 ```bash
 # Warm the image cache and the model in a throwaway folder
 mkdir -p /tmp/pondok-warmup && cd /tmp/pondok-warmup
-npx pondok-ai init --preset minimal --yes
+npx pondok-ai init --preset minimal --native-ollama --yes
 npx pondok-ai up
-npx pondok-ai model install llama3.2:3b
+npx pondok-ai model install gemma3:1b
 ```
 
-Then open http://localhost:3000, create the admin account, pick `llama3.2:3b` as the default model,
+Then open http://localhost:3000, create the admin account, pick `gemma3:1b` as the default model,
 and send one throwaway message so the model is loaded into memory. Close the chat.
 
 Finally stop the warm-up stack so `up` in the recording really starts it (volumes and cached images are kept):
@@ -67,7 +73,7 @@ With the stack from step 2 still running, record the chat with Playwright (it si
 
 ```bash
 npm i --no-save playwright
-WEBUI_EMAIL=you@example.com WEBUI_PASSWORD=... node docs/demo/record-browser.mjs
+WEBUI_EMAIL=you@example.com WEBUI_PASSWORD=... DEMO_MODEL=gemma3:1b node docs/demo/record-browser.mjs
 ```
 
 This writes `docs/demo/browser.mp4` and `docs/demo/screenshots/chat.png`, both at 1920×1080.
@@ -77,26 +83,27 @@ model or question, and `CHROMIUM_PATH` to use a browser you already have.
 
 ## 4. Cut the waiting and build the video and GIF
 
-On a machine without a GPU the first token and the reply together can take more than a minute, so trim both clips
-and speed up the waiting with `edit-clip.sh`. Every sped-up part gets a label on screen. Each segment is
+Trim the idle time and speed up the waiting with `edit-clip.sh`. On a machine without a GPU the first token and the
+reply together can take more than a minute; on the M1 with `gemma3:1b` the reply took about a second, so only the
+wait for Open WebUI to start is sped up. Every sped-up part gets a label on screen. Each segment is
 `START END SPEED [LABEL]` in seconds of the raw clip; find the times by stepping through your own recording.
 The committed take used:
 
 ```bash
 docs/demo/edit-clip.sh docs/demo/terminal.mp4 docs/demo/terminal-cut.mp4 \
-  "0 6.5 1;10.6 15 1;15 36.6 6 6x speed: waiting for health checks;36.6 39.5 1"
-docs/demo/edit-clip.sh docs/demo/browser.mp4 docs/demo/browser-cut.mp4 \
-  "0 4.6 1;4.6 52.5 20 20x speed: waiting for the first token (CPU only);52.5 86.8 5 5x speed: reply streaming (CPU only);86.8 90.5 1"
+  "0 7 1;11.3 14.5 1;14.5 26.4 4 4x speed: Open WebUI starting;26.4 30 1"
 ```
+
+The browser clip was short enough to use whole.
 
 Then join them:
 
 ```bash
-docs/demo/make-gif.sh docs/demo/terminal-cut.mp4 docs/demo/browser-cut.mp4
+docs/demo/make-gif.sh docs/demo/terminal-cut.mp4 docs/demo/browser.mp4
 ```
 
-This writes `docs/demo/demo.mp4` (1920×1080, 30 fps) and `docs/demo/demo.gif` (1280px, 15 fps).
-Keep the GIF under about 10 MB so GitHub shows it inline. If it is too large, try `WIDTH=960 FPS=12`.
+This writes `docs/demo/demo.mp4` (1920×1080, 30 fps) and `docs/demo/demo.gif` (1920px, 15 fps).
+Keep the GIF under about 10 MB so GitHub shows it inline. If it is too large, try `WIDTH=1280` or `FPS=12`.
 
 ## 5. Terminal screenshots
 
@@ -112,9 +119,9 @@ Commit `demo.mp4`, `demo.gif`, and the screenshots. The raw and cut clips are ig
 
 ## Checklist before committing
 
-- [ ] Total length is 30–40 seconds
+- [ ] Total length is 25–40 seconds
 - [ ] No real hostnames, emails, API keys, or other personal data on screen
-- [ ] The reply visibly comes from `llama3.2:3b` running locally
+- [ ] The reply visibly comes from `gemma3:1b` running locally
 - [ ] Every sped-up part is labelled on screen
 - [ ] The GIF loops cleanly and is under about 10 MB
 
@@ -123,7 +130,8 @@ Commit `demo.mp4`, `demo.gif`, and the screenshots. The raw and cut clips are ig
 The demo in the "Share on your network" section shows `pondok-ai share` end to end in about a minute:
 the teacher shares Open WebUI, a student opens the link on a phone and signs up, the teacher approves the
 account, and the student asks a question in Indonesian. It is built from four 1080p clips stitched by
-`make-classroom.sh` into `docs/demo/classroom.mp4` (1920×1080) and `docs/demo/classroom.gif` (1280px).
+`make-classroom.sh` into `docs/demo/classroom.mp4` (1920×1080) and `docs/demo/classroom.gif` (1920px). The committed take
+was recorded on the same M1 Mac as the README demo, with `gemma3:1b`.
 
 | Clip | Recorded with | Shows |
 |---|---|---|
@@ -134,30 +142,40 @@ account, and the student asks a question in Indonesian. It is built from four 10
 
 ## 1. Prepare
 
-Use a fresh Open WebUI volume so the student list only shows the demo accounts, then:
+Use a fresh Open WebUI volume so the student list only shows the demo accounts and none of your own data is on
+camera, then:
 
 ```bash
 mkdir -p /tmp/pondok-kelas && cd /tmp/pondok-kelas
-npx pondok-ai init --preset minimal --yes
+npx pondok-ai init --preset minimal --native-ollama --yes
 npx pondok-ai up
-npx pondok-ai model install llama3.2:3b
+npx pondok-ai model install gemma3:1b
 ```
+
+If this machine already has a stack with your own account, keep its volume out of the recording: stop it with
+`docker compose -p pondok-ai down` (without `-v`), then start the generated compose file under another project
+name, which gets new, empty volumes:
+
+```bash
+docker compose -f .pondok-ai/docker-compose.yml --env-file .pondok-ai/.env -p pondok-demo up -d
+```
+
+Remove it afterwards with `docker compose -p pondok-demo down -v` and start your own stack again.
 
 Open http://localhost:3000, create the admin account (a teacher name and an `example.com` email), then in
 **Admin Panel > Settings > General** turn on **New Sign Ups**, keep **Default User Role** at **Pending**, and turn off
-**Show Admin Details in Account Pending Overlay**. In **Admin Panel > Settings > Models** make `llama3.2:3b` the
+**Show Admin Details in Account Pending Overlay**. In **Admin Panel > Settings > Models** make `gemma3:1b` the
 default model. Send one throwaway message so the model is loaded, then run `npx pondok-ai share` once so the
 recorded run does not recreate the container.
 
 The phone has to reach the LAN address that `share` prints, not `localhost`. A second device on the same Wi-Fi
-works; on Linux a network namespace joined to the host with a veth pair does too (the committed take used
-`192.168.50.10` for the host and ran the phone steps inside the namespace).
+works, and so does a browser on the same machine opening the LAN address (the committed take did that).
 
 ## 2. Record
 
 ```bash
 PONDOK_DIR=/tmp/pondok-kelas vhs docs/demo/classroom.tape
-export SHARE_URL=http://192.168.50.10:3000 ADMIN_EMAIL=... ADMIN_PASSWORD=...
+export SHARE_URL=http://<LAN address>:3000 ADMIN_EMAIL=... ADMIN_PASSWORD=...
 node docs/demo/record-classroom.mjs signup
 node docs/demo/record-classroom.mjs chat &   # waits on the pending screen
 node docs/demo/record-classroom.mjs admin    # approves; the chat step then continues
@@ -166,20 +184,22 @@ wait
 
 The phone is a Pixel 7 viewport at 2× device scale and the admin page is 1024×576 at 1.875× (1920×1080), both
 recorded as timed screenshots so text stays sharp. Headless screenshots have no mouse pointer, so the admin clip
-draws a dot that follows the real mouse.
-
-`gemma3:4b` (what `model recommend --lang id` suggests) answers this prompt well, but Open WebUI 0.11 sends its
-built-in tools with every chat and Ollama rejects them for models without tool support ("does not support tools").
-The committed take uses `llama3.2:3b`, which works out of the box.
+draws a dot that follows the real mouse. The admin step filters the user list to the student, so other accounts
+stay off camera, and waits up to `ADMIN_WAIT` seconds (default 30) for the student to sign up, so it also works
+when a real phone signs up.
 
 ## 3. Cut and build
 
 The committed take used:
 
 ```bash
-CHAT_CUT="0 10 1;10 65.5 20 20x speed: model thinking (CPU only);65.5 113.3 6 6x speed: reply streaming (CPU only);113.3 118 1" \
-  docs/demo/make-classroom.sh
+CHAT_CUT="0 16 1" MODEL=gemma3:1b docs/demo/make-classroom.sh
 ```
+
+The terminal clip of the committed take was recorded against a stack whose own Open WebUI had sign-ups off, so
+`share` printed its four-line "One step left: nobody can sign up yet" hint. Those four lines were cut out of the
+frame (`crop` and `vstack` in ffmpeg), which leaves exactly what `share` prints when sign-ups are on, as they were in
+the demo Open WebUI.
 
 `TERMINAL_CUT`, `SIGNUP_CUT` and `ADMIN_CUT` default to the whole clip (the terminal clip to its first 9 seconds).
 Commit `classroom.mp4` and `classroom.gif`; the raw clips are ignored by git.

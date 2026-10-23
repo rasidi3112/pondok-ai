@@ -19,10 +19,10 @@ Yerel LLM'ler, bir sohbet arayüzü, vektör arama ve OpenAI uyumlu bir API, Doc
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="pondok-ai demosu: init, up ve ardından Open WebUI'da llama3.2:3b ile sohbet" width="100%">
+  <img src="docs/demo/demo.gif" alt="pondok-ai demosu: init, up ve ardından Open WebUI'da gemma3:1b ile sohbet" width="100%">
 </a>
 
-<sub>Boş bir klasörden yerel bir modelin yanıtına. Yalnızca CPU'lu bir makinede, imajlar ve model önceden indirilmiş olarak kaydedildi; bekleme süreleri hızlandırıldı ve ekranda belirtildi.<br>
+<sub>Boş bir klasörden yerel bir modelin yanıtına. Yerel Ollama (Metal GPU) kullanan bir Apple M1 Mac'te, imajlar ve model önceden indirilmiş olarak kaydedildi; Open WebUI'nin başlamasını bekleme süresi hızlandırıldı ve ekranda belirtildi. Mac'te 10 GB'tan az boş disk alanı olduğu için <code>init</code>, <code>--force</code> ile çalıştırıldı.<br>
 <a href="docs/demo/demo.mp4"><b>▶ 1080p videoyu izleyin</b></a></sub>
 
 <br>
@@ -119,9 +119,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## Ekran Görüntüleri
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Yerelde çalışan llama3.2:3b ile bir soruyu yanıtlayan Open WebUI" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Yerelde çalışan gemma3:1b ile bir soruyu yanıtlayan Open WebUI" width="100%">
   <br>
-  <sub>Yerel Ollama konteynerinin sunduğu <code>llama3.2:3b</code> ile sohbet eden Open WebUI.</sub>
+  <sub>Bir Apple M1 Mac'teki yerel Ollama'nın sunduğu <code>gemma3:1b</code> ile sohbet eden Open WebUI.</sub>
 </p>
 
 <table>

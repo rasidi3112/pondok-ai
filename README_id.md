@@ -19,10 +19,10 @@ LLM lokal, antarmuka chat, pencarian vektor, dan API yang kompatibel dengan Open
 <br>
 
 <a href="docs/demo/demo.mp4">
-  <img src="docs/demo/demo.gif" alt="Demo pondok-ai: init, up, lalu chat dengan llama3.2:3b di Open WebUI" width="100%">
+  <img src="docs/demo/demo.gif" alt="Demo pondok-ai: init, up, lalu chat dengan gemma3:1b di Open WebUI" width="100%">
 </a>
 
-<sub>Dari folder kosong hingga balasan dari model lokal. Direkam di mesin tanpa GPU (hanya CPU) dengan image dan model yang sudah diunduh sebelumnya; waktu tunggu dipercepat dan ditandai di layar.<br>
+<sub>Dari folder kosong hingga balasan dari model lokal. Direkam di Mac Apple M1 dengan Ollama native (GPU Metal), dengan image dan model yang sudah diunduh sebelumnya; waktu tunggu Open WebUI menyala dipercepat dan ditandai di layar. Ruang disk kosong Mac tersebut kurang dari 10 GB, sehingga <code>init</code> dijalankan dengan <code>--force</code>.<br>
 <a href="docs/demo/demo.mp4"><b>▶ Tonton video 1080p</b></a></sub>
 
 <br>
@@ -123,9 +123,9 @@ iwr -useb https://raw.githubusercontent.com/rasidi3112/pondok-ai/main/scripts/in
 ## Tangkapan Layar
 
 <p align="center">
-  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI menjawab pertanyaan dengan llama3.2:3b yang berjalan secara lokal" width="100%">
+  <img src="docs/demo/screenshots/chat.png" alt="Open WebUI menjawab pertanyaan dengan gemma3:1b yang berjalan secara lokal" width="100%">
   <br>
-  <sub>Open WebUI melakukan chat dengan <code>llama3.2:3b</code>, dilayani oleh container Ollama lokal.</sub>
+  <sub>Open WebUI melakukan chat dengan <code>gemma3:1b</code>, dilayani oleh Ollama native di Mac Apple M1.</sub>
 </p>
 
 <table>
@@ -155,7 +155,7 @@ Satu komputer bisa melayani satu kelas, kantor, atau pesantren. Semua orang yang
   <img src="docs/demo/classroom.gif" alt="Demo kelas: pondok-ai share menampilkan QR code, siswa mendaftar dari ponsel, guru menyetujui, lalu siswa chat dalam bahasa Indonesia" width="100%">
 </a>
 
-<sub>Guru menjalankan <code>pondok-ai share</code>, siswa membuka tautannya di ponsel dan mendaftar, guru menyetujui akunnya, lalu siswa bertanya dalam bahasa Indonesia. Direkam di mesin tanpa GPU (hanya CPU); waktu tunggu model dipercepat dan ditandai di layar.<br>
+<sub>Guru menjalankan <code>pondok-ai share</code>, siswa membuka tautannya di ponsel dan mendaftar, guru menyetujui akunnya, lalu siswa bertanya dalam bahasa Indonesia. Direkam di Mac Apple M1 dengan <code>gemma3:1b</code>; ponselnya adalah browser seukuran ponsel di Wi-Fi yang sama, dan tidak ada bagian yang dipercepat.<br>
 <a href="docs/demo/classroom.mp4"><b>▶ Tonton video 1080p</b></a></sub>
 
 1. Nyalakan stack, lalu buka http://localhost:3000 di komputer ini dan buat akun admin.
