@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-10-23
+
 ### Added
 - `up` starts a native Ollama on macOS when it is not running. It opens the Ollama app when installed and otherwise runs `ollama serve` in the background, logging to `.pondok-ai/ollama.log`. The manual hint is only shown when both fail.
 - `up` points to the recommended model for your RAM (`pondok-ai model install ...`) when Ollama has no models yet, since Open WebUI has nothing to chat with until one is installed.
